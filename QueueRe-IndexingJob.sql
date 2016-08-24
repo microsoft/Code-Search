@@ -3,17 +3,7 @@
   * DATABASE : CONFIGURATION DB
   **/
 
---**UPDATE** Enter the Collection id here which needs to be re-indexed or the to which the repository belongs to which needs to be re-indexed
-Declare @CollectionId uniqueidentifier = 'EF426DB3-BE71-4F78-A957-027542E140BD';
-
-DECLARE @validCollectionId int;
-Select @validCollectionId =  Count(*) from [dbo].[tbl_ServiceHost] where HostId = @CollectionId
-
-if(@validCollectionId = 0)
-BEGIN
-	PRINT N'Please enter a valid Collection ID.'
-	Return
-END
+Declare @CollectionId uniqueidentifier = $(CollectionID);
 
 Declare @jobList dbo.typ_GuidInt32Table
 

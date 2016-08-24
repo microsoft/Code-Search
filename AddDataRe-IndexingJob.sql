@@ -6,31 +6,17 @@
 
 -- **UPDATE** 
 -- The value here can be either "Git_Repository/Tfs_Repository" or "Collection", based on if you want to do some GIT/TFVC repository re-indexing or collection.
-DECLARE @IndexingUnitType nvarchar(30) = 'Git_Repository' 
-
--- **UPDATE**
--- Enter the Collection Name here.
-DECLARE @CollectionName nvarchar(max) = 'TestCollection2' 
+DECLARE @IndexingUnitType nvarchar(30) = $(IndexingUnitType)
 
 -- **UPDATE**
 -- Update the tfvc/git repository name here. For Repairing/Re-indexing a collection, this can be any string.
-DECLARE @RepositoryName nvarchar(max) = 'test33' 
+DECLARE @RepositoryName nvarchar(max) = $(RepositoryName) 
 
 -- **UPDATE**
 -- Update the type of repository, use 'Git_Repository' for git repos and 'Tfs_Repository' for TFVC projects.
-DECLARE @RepositoryType varchar(30) = 'Git_Repository' 
+DECLARE @RepositoryType varchar(30) = $(RepositoryType) 
 
-DECLARE @CollectionId uniqueidentifier;
-
--- **UPDATE** THE Tfs_Configuration to the "CONFIGURATION DATABASE" NAME HERE!!!**
-Select @CollectionId = HostID from [Tfs_Configuration].[dbo].[tbl_ServiceHost] where Name = @CollectionName
-
-if(@CollectionId is null)
-BEGIN
-	PRINT N'Please enter a valid Collection Name.'
-	Return
-END
-
+DECLARE @CollectionId uniqueidentifier = $(CollectionId)
 DECLARE @RepositoryId varchar(50) = ''
 if(@IndexingUnitType <> 'Collection')
 BEGIN
@@ -50,7 +36,7 @@ SET @JobData = REPLACE(REPLACE(REPLACE(@JobData, '$UnitType', @IndexingUnitType)
 							'$RepoType', @RepositoryType)
 
 DECLARE @partitionID varchar(50)
-Select @partitionID = PartitionID from [dbo].[tbl_DatabasePartitionMap] where ServiceHostId = @CollectionId
+Select @partitionID = PartitionID from [dbo].[tbl_DatabasePartitionMap] where ServiceHostId = @CollectionId 
 
 -- ID of the job to be queued.
 DECLARE @JobID uniqueIdentifier = 'C1F3C994-3C3A-4AC5-8A21-CDB6B5FC8EE8'
