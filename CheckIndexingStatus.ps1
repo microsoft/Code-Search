@@ -52,7 +52,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
     #Gets the result of the AccountFaultIn job
-    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
+    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
     
     $resultState = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
     $resultMessage = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
