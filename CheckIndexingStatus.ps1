@@ -54,8 +54,8 @@ if($isCollectionIndexed.RegValue -eq "True")
     #Gets the result of the AccountFaultIn job
     $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
     
-    $resultState = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
-    $resultMessage = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
+    $resultState = $queryResults  | Select-object  -ExpandProperty  Result
+    $resultMessage = $queryResults  | Select-object  -ExpandProperty  ResultMessage
 
     if($resultState -eq 0)
     {
