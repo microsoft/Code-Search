@@ -54,8 +54,8 @@ if($isCollectionIndexed.RegValue -eq "True")
     #Gets the result of the AccountFaultIn job
     $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
     
-    $resultState = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
-    $resultMessage = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
+    $resultState = $queryResults  | Select-object  -ExpandProperty  Result
+    $resultMessage = $queryResults  | Select-object  -ExpandProperty  ResultMessage
 
     if($resultState -eq 0)
     {
@@ -70,7 +70,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CountRepositoryIndexingCompleted.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
     $indexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
-    if($indexingCompletedRepositoryCount -gt 1)
+    if($indexingCompletedRepositoryCount -gt 0)
     {
         Write-Host "Repositories completed indexing: '$indexingCompletedRepositoryCount'" -ForegroundColor Yellow
     }
