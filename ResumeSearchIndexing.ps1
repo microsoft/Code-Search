@@ -21,6 +21,6 @@ else
 	exit
 }
 
-Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\StartSearchIndexing.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\ResumeSearchIndexing.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
 Write-Host "Indexing has been resumed!!" -ForegroundColor Green
 Pop-Location
