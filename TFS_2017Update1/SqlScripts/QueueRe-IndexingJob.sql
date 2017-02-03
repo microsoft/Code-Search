@@ -1,13 +1,13 @@
-/** This sql script is used to queue the Code Re-index Job in case of shard corruption for the given collection id.
+/** This sql script is used to queue the Code Repair Job in case of fresh indexing of the repostiory of the given collection id.
   * Update the Collection id in the variable under the comment **UPDATE**
   * DATABASE : CONFIGURATION DB
   **/
 
 Declare @CollectionId uniqueidentifier = $(CollectionID);
 
-Declare @jobList dbo.typ_GuidInt32Table
+Declare @jobList dbo.typ_JobQueueUpdateTable
 
--- ID of the job to be queued.
+-- ID of the Code Repair job to be queued.
 DECLARE @JobID uniqueIdentifier = 'C1F3C994-3C3A-4AC5-8A21-CDB6B5FC8EE8'
 Insert into @jobList values (@JobID, 10);
 Declare @priorityLevel int;
