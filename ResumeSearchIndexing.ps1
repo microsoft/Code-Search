@@ -20,7 +20,7 @@ else
     Pop-Location
 	exit
 }
-
-Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\ResumeSearchIndexing.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeSearchIndexing.sql'
+Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
 Write-Host "Indexing has been resumed!!" -ForegroundColor Green
 Pop-Location

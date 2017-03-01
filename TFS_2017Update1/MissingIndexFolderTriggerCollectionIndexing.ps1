@@ -42,13 +42,17 @@ $isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryIt
 if($isCollectionIndexed.RegValue -eq "True")
 {
     $Params = "CollectionId='$CollectionID'"
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CleanUpCollectionIndexingState_IndexDelete.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+    $fullpath = [System.io.path]::Combine($PWD, 'SqlScripts\CleanUpCollectionIndexingState_IndexDelete.sql')
+
+    Invoke-Sqlcmd -InputFile $fullpath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
     Write-Host "Cleaned up the Collection Indexing state..." -ForegroundColor Yellow
 
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AddExtensionInstallJobData.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
+    $fullpath = [System.io.path]::Combine($PWD, 'SqlScripts\AddExtensionInstallJobData.sql')
+    Invoke-Sqlcmd -InputFile $fullpath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
     Write-Host "Added the indexing job data..." -ForegroundColor Yellow
 
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\QueueExtensionInstallIndexing.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
+    $fullpath = [System.io.path]::Combine($PWD, 'SqlScripts\QueueExtensionInstallIndexing.sql')
+    Invoke-Sqlcmd -InputFile $fullpath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
     Write-Host "Successfully queued the Indexing job for the collection!!" -ForegroundColor Green
 }
 else
