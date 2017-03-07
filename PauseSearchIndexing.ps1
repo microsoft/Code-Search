@@ -26,8 +26,8 @@ if($userInput -like "Yes")
         Pop-Location
 	    exit
     }
-
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\PauseSearchIndexing.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\PauseSearchIndexing.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  
     Write-Host "Indexing has been paused!! Run ResumeSearchIndexing.ps1 to resume indexing." -ForegroundColor Green
     Pop-Location
 }
