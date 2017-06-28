@@ -52,7 +52,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
     # Gets the count of repositories for which fresh indexing has completed.
-    $SqlFullPath = Join-Path $PWD  -ChildPath 'SqlScripts\BulkIndexingActivity.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\BulkIndexingActivity.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
     $bulkIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingCompletedCount
 
@@ -66,7 +66,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
 
     # Gets the count of repositories for which fresh indexing is InProgress.
-    $SqlFullPath = Join-Path $PWD  -ChildPath 'SqlScripts\BulkIndexingInProgressActivity.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\BulkIndexingInProgressActivity.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
     $bulkIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingInProgressCount
 
@@ -81,7 +81,7 @@ if($isCollectionIndexed.RegValue -eq "True")
 
 
      # Gets the count of repositories for which continuous indexing has completed.
-    $SqlFullPath = Join-Path $PWD  -ChildPath 'SqlScripts\ContinuousIndexingActivity.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ContinuousIndexingActivity.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
     $continuousIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingCompletedCount
 
@@ -95,7 +95,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
 
     # Gets the count of repositories for which continuous indexing is InProgress.
-    $SqlFullPath = Join-Path $PWD  -ChildPath 'SqlScripts\ContinuousIndexingInProgressActivity.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ContinuousIndexingInProgressActivity.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
     $continuousIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingInProgressCount
 
@@ -109,7 +109,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
 
     # Gets the count of Failed Indexing jobs.
-    $SqlFullPath = Join-Path $PWD  -ChildPath 'SqlScripts\FailedIndexingActivity.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\FailedIndexingActivity.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
     $failedIndexingJobsCount = $queryResults  | Select-object  -ExpandProperty  FailedIndexingCount
 

@@ -19,40 +19,24 @@ Param(
     [string]$RepositoryName
 )
 
+Import-Module .\Common.psm1 -Force
+
 [System.ENVIRONMENT]::CurrentDirectory = $PWD
 Push-Location
+ImportSQLModule
 
-$moduleCheck = Get-Module -List SQLPS
-if($moduleCheck)
-{
-	Import-Module -Name SQLPS -DisableNameChecking
-}
-else
-{
-	Write-Error "Cannot load module SQLPS. Please try from a machine running SQL Server 2012 or higher."
-    Pop-Location
-	exit
-}
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
 
-$queryResults = Invoke-Sqlcmd -Query "Select HostID from [dbo].[tbl_ServiceHost] where Name = '$CollectionName'" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  
-
-$CollectionID = $queryResults  | Select-object  -ExpandProperty  HOSTID
-
-if(!$CollectionID)
-{
-	throw "Invalid Collection Name: '$CollectionName'"
-}
-
-$isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryItems where ChildItem like '%IsCollectionIndexed%' and PartitionId > 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName
-
-if($isCollectionIndexed.RegValue -eq "True")
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
 {
     $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'"
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AddDataRe-IndexingJob.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddCodeRe-IndexingJobData.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
     Write-Host "Added the job data as '$addDataParams'" -ForegroundColor Cyan
 
     $queueJobParams = "CollectionID='$CollectionID'"
-    Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\QueueRe-IndexingJob.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueCodeRe-IndexingJob.sql.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
     Write-Host "Successfully queued re-indexing job for the repository." -ForegroundColor Green
 }
 else
