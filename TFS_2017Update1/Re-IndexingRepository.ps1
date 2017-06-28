@@ -48,13 +48,13 @@ $isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryIt
 if($isCollectionIndexed.RegValue -eq "True")
 {
     $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'"
-    $fullpath = Join-path $PWD -ChildPath 'SqlScripts\AddDataRe-IndexingJob.sql'
-    Invoke-Sqlcmd -InputFile $fullpath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddDataRe-IndexingJob.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
     Write-Host "Added the job data as '$addDataParams'" -ForegroundColor Cyan
 
     $queueJobParams = "CollectionID='$CollectionID'"
-    $fullpath = Join-Path $PWD -ChildPath 'SqlScripts\QueueRe-IndexingJob.sql'
-    Invoke-Sqlcmd -InputFile $fullpath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueRe-IndexingJob.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
     Write-Host "Successfully queued re-indexing job for the repository." -ForegroundColor Green
 }
 else

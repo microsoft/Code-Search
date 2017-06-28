@@ -52,8 +52,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
     #Gets the result of the AccountFaultIn job
-    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AccountFaultInResult.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
+    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\AccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
     
     $resultState = $queryResults  | Select-object  -ExpandProperty  Result
     $resultMessage = $queryResults  | Select-object  -ExpandProperty  ResultMessage
@@ -68,8 +67,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
 
     # Gets the count of repositories for which the indexing has completed.
-    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CountRepositoryIndexingCompleted.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CountRepositoryIndexingCompleted.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
     $indexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
     if($indexingCompletedRepositoryCount -gt 0)
@@ -82,8 +80,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
         
     # Gets the data for files pending to be indexing for repositories in data crawl stage.
-    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\IndexingInProgressRepositoryCount.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
+    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\IndexingInProgressRepositoryCount.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
     
     if($queryResults.ChildItem.Length -gt 0)
     {
@@ -101,8 +98,7 @@ if($isCollectionIndexed.RegValue -eq "True")
     }
     
     # Gets the data for the repositories which are still discovering files. 
-    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\RepositoriesInFileDiscoveryPhase.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
+    $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\RepositoriesInFileDiscoveryPhase.sql" -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
 
     if($queryResults.ChildItem.Length -gt 0)
     {
