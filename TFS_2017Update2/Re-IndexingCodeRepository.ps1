@@ -35,7 +35,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
     Write-Host "Added the job data as '$addDataParams'" -ForegroundColor Cyan
 
     $queueJobParams = "CollectionID='$CollectionID'"
-    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueCodeRe-IndexingJob.sql.sql'
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueCodeRe-IndexingJob.sql'
     Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
     Write-Host "Successfully queued re-indexing job for the repository." -ForegroundColor Green
 }
