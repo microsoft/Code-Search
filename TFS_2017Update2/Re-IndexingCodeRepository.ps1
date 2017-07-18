@@ -9,7 +9,7 @@ Param(
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
 
-    [Parameter(Mandatory=$True, Position=3, HelpMessage="The value here can be either 'Git_Repository/Tfs_Repository', based on if you want to do some GIT/TFVC repository re-indexing")]
+    [Parameter(Mandatory=$True, Position=3, HelpMessage="The value here can be either 'Git_Repository/TFVC_Repository', based on if you want to do some GIT/TFVC repository re-indexing")]
     [string]$IndexingUnitType,
    
     [Parameter(Mandatory=$True, Position=4, HelpMessage="Enter the Collection Name here.")]
