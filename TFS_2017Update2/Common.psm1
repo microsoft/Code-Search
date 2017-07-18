@@ -3,25 +3,25 @@
     $moduleCheck = Get-Module -List SQLSERVER
     if($moduleCheck)
     {
-	    Import-Module -Name SQLSERVER -DisableNameChecking
+	Import-Module -Name SQLSERVER -DisableNameChecking
         Write-Host "Loaded SQLSERVER module..." -ForegroundColor Green
     }
     else
     {
-	     Write-Host "Cannot load module SQLSERVER. Trying to load SQLPS module." -ForegroundColor Yellow
+	Write-Host "Cannot load module SQLSERVER. Trying to load SQLPS module." -ForegroundColor Yellow
 
         $moduleCheck = Get-Module -List SQLPS
         
         if($moduleCheck)
         {
-	        Import-Module -Name SQLPS -DisableNameChecking
+	    Import-Module -Name SQLPS -DisableNameChecking
             Write-Host "Loaded SQLPS module..." -ForegroundColor Green
         }
         else
         {
             Write-Host "Cannot load SQLPS as well. Try running the script from a machine with SQL Server 2014 or higher installed or powershell 5.0" -ForegroundColor Red
             Pop-Location
-	        exit
+	    exit
         }
     }
 }
