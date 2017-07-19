@@ -2,19 +2,19 @@
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The SQL Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
-   
+
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Collection Database name.")]
     [string]$CollectionDatabaseName,
-    
+
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
-   
+
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName,
-    
+
     [Parameter(Mandatory=$True, Position=4, HelpMessage="Enter the days since last indexing was triggered for this collection")]
     [string]$Days,
-    
+
     [Parameter(Mandatory=$False, Position=5, HelpMessage="Extension install indexing state for Code, WorkItem or All")]
     [string]$EntityType = "All"
 )
@@ -30,7 +30,7 @@ function CodeExtensionInstallIndexingStatus
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeAccountFaultInResult.sql'
         $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CodeAccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
-    
+
         if($queryResults)
         {
             $resultState = $queryResults  | Select-object  -ExpandProperty  Result
@@ -58,16 +58,16 @@ function CodeExtensionInstallIndexingStatus
             {
                 Write-Host "No Code repositories completed fresh indexing in this collection in last $Days days" -ForegroundColor Cyan
             }
-        
+
             # Gets the data for repositories which are still inprogress.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingInProgressRepositoryCount.sql'
             $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
-            
+
             if($queryResults.ItemArray.Count -gt 0)
             {
                 Write-Host "Status of code indexing:" -ForegroundColor Yellow
                 Write-Host "Repository Id                         | Repository Name" -ForegroundColor Green
- 
+
                 foreach($row in $queryResults)
                 {
                     Write-Host "$($row.TfsEntityId)  | $($row.RepositoryIndexingInProgress)" -ForegroundColor Yellow
@@ -98,7 +98,7 @@ function WorkItemExtensionInstallIndexingStatus
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemAccountFaultInResult.sql'
         $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params
-    
+
         if($queryResults)
         {
             $resultState = $queryResults  | Select-object  -ExpandProperty  Result
@@ -126,16 +126,16 @@ function WorkItemExtensionInstallIndexingStatus
             {
                 Write-Host "No WorkItem Projects completed fresh indexing in this collection in last $Days days" -ForegroundColor Cyan
             }
-        
+
             # Gets the data for projects with workitem indexing still inprogress.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemIndexingInProgressRepositoryCount.sql'
             $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
-            
+
             if($queryResults.ItemArray.Count -gt 0)
             {
                 Write-Host "Status of WorkItem indexing:" -ForegroundColor Yellow
                 Write-Host "Project Id                         | Project Name" -ForegroundColor Green
- 
+
                 foreach($row in $queryResults)
                 {
                     Write-Host "$($row.TfsEntityId)  | $($row.ProjectWorkItemIndexingInProgress)" -ForegroundColor Yellow
@@ -166,18 +166,18 @@ ImportSQLModule
 # Checking for valid Collection Name.
 $CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
 
-$Params = "CollectionId='$CollectionID'" 
+$Params = "CollectionId='$CollectionID'"
 $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
 switch ($EntityType)
 {
-    "All" 
+    "All"
         {
             Write-Host "Fetching Indexing Activity for Code and WorkItem..." -ForegroundColor Green
             CodeExtensionInstallIndexingStatus
             WorkItemExtensionInstallIndexingStatus
         }
-    "WorkItem" 
+    "WorkItem"
         {
             Write-Host "Fetching Indexing Activity for WorkItem..." -ForegroundColor Green
             WorkItemExtensionInstallIndexingStatus
@@ -187,7 +187,7 @@ switch ($EntityType)
             Write-Host "Fetching Indexing Activity for Code..." -ForegroundColor Green
             CodeExtensionInstallIndexingStatus
         }
-    default 
+    default
         {
             Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
         }

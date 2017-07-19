@@ -7,7 +7,7 @@ Declare @CollectionId uniqueidentifier = $(CollectionID);
 Declare @Days int = $(DaysAgo);
 
 Select Count(JobId) as ContinuousIndexingCompletedCount from tbl_JobHistory
-where 
+where
 JobSource = @CollectionId
 and QueueTime >  DATEADD(DAY, -@Days, GETUTCDATE())
 and ResultMessage like '%UpdateIndex%Completed pipeline execution for IndexingUnit%EntityType: WorkItem%'

@@ -5,7 +5,7 @@ Param(
 
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
-    
+
     [Parameter(Mandatory=$False, Position=2, HelpMessage="Resume Indexing for Code, WorkItem or All")]
     [string]$EntityType = "All"
 )
@@ -29,14 +29,14 @@ function ImportSQLModule
     $moduleCheck = Get-Module -List SQLPS
     if($moduleCheck)
     {
-	    Import-Module -Name SQLPS -DisableNameChecking
+        Import-Module -Name SQLPS -DisableNameChecking
         Write-Host "Loaded SQLPS module..." -ForegroundColor Green
     }
     else
     {
-	    Write-Error "Cannot load module SQLPS. Please try from a machine running SQL Server 2012 or higher."
+        Write-Error "Cannot load module SQLPS. Please try from a machine running SQL Server 2012 or higher."
         Pop-Location
-	    exit
+        exit
     }
 }
 
@@ -46,13 +46,13 @@ ImportSQLModule
 
 switch ($EntityType)
 {
-    "All" 
+    "All"
         {
             Write-Host "Resuming indexing for Code and WorkItem..." -ForegroundColor Green
             ResumeCodeIndexing
             ResumeWorkItemIndexing
         }
-    "WorkItem" 
+    "WorkItem"
         {
             Write-Host "Resuming indexing for WorkItem..." -ForegroundColor Green
             ResumeWorkItemIndexing
@@ -62,7 +62,7 @@ switch ($EntityType)
             Write-Host "Resuming indexing for Code..." -ForegroundColor Green
             ResumeCodeIndexing
         }
-    default 
+    default
         {
             Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
         }

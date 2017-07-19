@@ -5,7 +5,7 @@
 
     If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
     {
-	    return $true
+        return $true
     }
     return $false
 }
@@ -18,7 +18,7 @@ function IsResetConfirm
     [string]$message
     )
     Write-Host $message  -NoNewline -ForegroundColor Magenta
-    $confirm = Read-Host 
+    $confirm = Read-Host
     if ($confirm.ToUpper().StartsWith(“Y”))
     {
     return $true
@@ -57,7 +57,7 @@ if(IsResetConfirm($message))
 {
     # Getting the install path of the Team Foundation Server
     $serviceName = 'elasticsearch-service-x64'
-    
+
     $servicePath = GetElasticsearchInstallPath($serviceName)
 
     if(-not $servicePath)
@@ -80,7 +80,7 @@ if(IsResetConfirm($message))
         Push-Location
 
         cd $servicePath
-        $outputService = .\Service.bat stop 
+        $outputService = .\Service.bat stop
         Write-Host $outputService -ForegroundColor Yellow
         if($outputService -like '*failed*')
         {
@@ -97,7 +97,7 @@ if(IsResetConfirm($message))
             Write-Host $outputService -ForegroundColor Yellow
         }
 
-        Pop-Location 
+        Pop-Location
     }
 }
 else
