@@ -5,7 +5,7 @@
 -- ** !! POST running this script, please run the "QueueRepairJob" script against the Configuration DB. !! **/
 
 -- **UPDATE** 
--- The value here can be either "Git_Repository/Tfs_Repository" or "Collection", based on if you want to do some GIT/TFVC repository re-indexing or collection.
+-- The value here can be either "Git_Repository/TFVC_Repository" or "Collection", based on if you want to do some GIT/TFVC repository re-indexing or collection.
 DECLARE @IndexingUnitType nvarchar(30) = $(IndexingUnitType)
 
 -- **UPDATE**
@@ -13,7 +13,7 @@ DECLARE @IndexingUnitType nvarchar(30) = $(IndexingUnitType)
 DECLARE @RepositoryName nvarchar(max) = $(RepositoryName) 
 
 -- **UPDATE**
--- Update the type of repository, use 'Git_Repository' for git repos and 'Tfs_Repository' for TFVC projects.
+-- Update the type of repository, use 'Git_Repository' for git repos and 'TFVC_Repository' for TFVC projects.
 DECLARE @RepositoryType varchar(30) = $(RepositoryType) 
 
 DECLARE @CollectionId uniqueidentifier = $(CollectionId)
