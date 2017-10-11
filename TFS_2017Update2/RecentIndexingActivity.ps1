@@ -2,19 +2,19 @@
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The SQL Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
-   
+
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Collection Database name.")]
     [string]$CollectionDatabaseName,
-    
+
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
-   
+
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName,
-    
+
     [Parameter(Mandatory=$True, Position=4, HelpMessage="Enter the days since last indexing was triggered for this collection")]
     [string]$Days,
-    
+
     [Parameter(Mandatory=$False, Position=5, HelpMessage="Trigger collection indexing for Code, WorkItem or All")]
     [string]$EntityType = "All"
 )
@@ -25,7 +25,7 @@ function CodeIndexingActivity
 
     if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
     {
-        $Params = "CollectionId='$CollectionID'" 
+        $Params = "CollectionId='$CollectionID'"
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
         # Gets the count of code repositories for which fresh indexing has completed.
@@ -102,7 +102,7 @@ function CodeIndexingActivity
     else
     {
         Write-Host "The Code Search extension is disabled for this account. Install the extension and then try again." -ForegroundColor DarkYellow
-    } 
+    }
 }
 
 function WorkItemIndexingActivity
@@ -111,7 +111,7 @@ function WorkItemIndexingActivity
 
     if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem")
     {
-        $Params = "CollectionId='$CollectionID'" 
+        $Params = "CollectionId='$CollectionID'"
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
         # Gets the count of code repositories for which fresh indexing has completed.
@@ -188,7 +188,7 @@ function WorkItemIndexingActivity
     else
     {
         Write-Host "The WorkItem search extension is disabled for this account. Install the extension and then try again." -ForegroundColor DarkYellow
-    } 
+    }
 }
 
 Import-Module .\Common.psm1 -Force
@@ -201,13 +201,13 @@ ImportSQLModule
 $CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
 switch ($EntityType)
 {
-    "All" 
+    "All"
         {
             Write-Host "Fetching Indexing Activity for Code and WorkItem..." -ForegroundColor Green
             CodeIndexingActivity
             WorkItemIndexingActivity
         }
-    "WorkItem" 
+    "WorkItem"
         {
             Write-Host "Fetching Indexing Activity for WorkItem..." -ForegroundColor Green
             WorkItemIndexingActivity
@@ -217,7 +217,7 @@ switch ($EntityType)
             Write-Host "Fetching Indexing Activity for Code..." -ForegroundColor Green
             CodeIndexingActivity
         }
-    default 
+    default
         {
             Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
         }

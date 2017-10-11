@@ -2,16 +2,16 @@
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
-   
+
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Collection Database name.")]
     [string]$CollectionDatabaseName,
-    
+
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
-   
+
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName,
-    
+
     [Parameter(Mandatory=$False, Position=4, HelpMessage="Trigger collection indexing for Code, WorkItem or All")]
     [string]$EntityType = "All"
 )
@@ -72,13 +72,13 @@ $CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabase
 
 switch ($EntityType)
 {
-    "All" 
+    "All"
         {
             Write-Host "Triggering indexing for Code and WorkItem..." -ForegroundColor Green
             TriggerCodeIndexing
             TriggerWorkItemIndexing
         }
-    "WorkItem" 
+    "WorkItem"
         {
             Write-Host "Triggering indexing for WorkItem..." -ForegroundColor Green
             TriggerWorkItemIndexing
@@ -88,7 +88,7 @@ switch ($EntityType)
             Write-Host "Triggering indexing for Code..." -ForegroundColor Green
             TriggerCodeIndexing
         }
-    default 
+    default
         {
             Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
         }
