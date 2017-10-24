@@ -17,7 +17,7 @@ DECLARE @RepositoryName nvarchar(max) = $(RepositoryName)
 DECLARE @RepositoryType varchar(30) = $(RepositoryType)
 
 DECLARE @CollectionId uniqueidentifier = $(CollectionId)
-DECLARE @RepositoryId varchar(50) = ''
+DECLARE @RepositoryId varchar(50)
 if(@IndexingUnitType <> 'Collection')
 BEGIN
 	SELECT @RepositoryId = TFSEntityId from Search.tbl_IndexingUnit
