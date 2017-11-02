@@ -1,0 +1,20 @@
+*****************************************************************************************
+To analyze ElasticSearch status, please share the results from following REST api calls.
+*****************************************************************************************
+
+Run the following in your browser:
+
+1. http://{SearchUrl}:9200/_cat/health?v 
+
+2. http://{SearchUrl}:9200/_cat/indices?v 
+
+3. http://{SearchUrl}:9200/_cat/shards?v
+
+4. http://{SearchUrl}:9200/_cat/aliases?v
+
+5. http://{SearchUrl}:9200/{indexName}/_mapping?v 
+   For {indexName} please choose the indices from step[2] which start with 'code'/'workitem' 
+   and has doc.count > 0
+
+____________________________________________________________________________________________
+
