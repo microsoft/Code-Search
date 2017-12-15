@@ -9,5 +9,5 @@ Declare @Days int = $(DaysAgo);
 Select Count(JobId) as ContinuousIndexingCompletedCount from tbl_JobHistory
 where
 JobSource = @CollectionId
-and QueueTime >  DATEADD(DAY, -@Days, GETUTCDATE())
+and EndTime >  DATEADD(DAY, -@Days, GETUTCDATE())
 and ResultMessage like '%UpdateIndex%Completed pipeline execution for IndexingUnit%EntityType: WorkItem%'
