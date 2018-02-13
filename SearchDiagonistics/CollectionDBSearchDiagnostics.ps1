@@ -116,6 +116,22 @@ function CollectionDBSearchStatus
                $row.Item(0),$row.Item(1),$row.Item(2),$row.Item(3),$row.Item(4),$row.Item(5),([Environment]::NewLine)
 		Add-Content -Path $DisabledFilesLogPath $disabledFileEntry
 	}
+    
+    ## Query Search Registry Settings data of collection
+	
+	$SearchRegistryLogPath = Join-Path $configLogDir -ChildPath 'SearchSettingRegistriesOfCollection.csv'
+	Write-Host "Fetching Search registry data for collection into $SearchRegistryLogPath ..." -ForegroundColor Green
+	Set-Content -Path $SearchRegistryLogPath ([Environment]::NewLine)
+	
+	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\SearchRegistryDataOfCollection.sql'
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	
+	foreach($row in $queryResults)
+	{
+		$searchRegEntry =  "{0},{1},{2}" -f `
+               $row.Item(0),$row.Item(1),$row.Item(2),([Environment]::NewLine)
+		Add-Content -Path $SearchRegistryLogPath $searchRegEntry
+	}
 	
 	## Query ClassificationNode Data
 	
