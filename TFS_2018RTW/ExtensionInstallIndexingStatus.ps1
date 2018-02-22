@@ -60,7 +60,7 @@ function CodeExtensionInstallIndexingStatus
             }
         
             # Gets the data for repositories which are still inprogress.
-            $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingInProgressRepositoryCount.sql'
+            $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeBulkIndexingInProgressRepositoryCount.sql'
             $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params
             
             if($queryResults.ItemArray.Count -gt 0)
