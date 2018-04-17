@@ -2,7 +2,7 @@
 To analyze Search issue in Team Foundation Server, please share the following data as listed below
 ***************************************************************************************************
 
-1. Share TFS/Search Configuration log
+1. Share TFS/Search Configuration log. Note that the below folder could be hidden. So enable viewing hidden items first.
    <DriveLocation>:\ProgramData\Microsoft\Team Foundation\Server Configuration\Logs
 
 2. Share ElasticSearch logs
