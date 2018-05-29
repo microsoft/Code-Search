@@ -10,4 +10,5 @@ Select Count(Distinct(JobId)) as IndexingCompletedCount from tbl_JobHistory
 where 
 JobSource = @CollectionId
 and EndTime >  DATEADD(DAY, -@Days, GETUTCDATE())
-and ResultMessage like '%BeginBulkIndex-AccountFaultIn%Completed pipeline execution for IndexingUnit%EntityType: Code%'
+and (ResultMessage like '%BeginBulkIndex-AccountFaultIn%Completed pipeline execution for IndexingUnit%EntityType: Code%'
+or ResultMessage like '%BeginBulkIndex-ReindexCollection%Completed pipeline execution for IndexingUnit%EntityType: Code%')
