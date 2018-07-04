@@ -119,7 +119,7 @@ function CollectionDBSearchStatus
     
     ## Query Search Registry Settings data of collection
 	
-	$SearchRegistryLogPath = Join-Path $configLogDir -ChildPath 'SearchSettingRegistriesOfCollection.csv'
+	$SearchRegistryLogPath = Join-Path $collectionLogDir -ChildPath 'SearchSettingRegistriesOfCollection.csv'
 	Write-Host "Fetching Search registry data for collection into $SearchRegistryLogPath ..." -ForegroundColor Green
 	Set-Content -Path $SearchRegistryLogPath ([Environment]::NewLine)
 	
