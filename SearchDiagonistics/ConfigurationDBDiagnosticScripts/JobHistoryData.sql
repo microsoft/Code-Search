@@ -16,6 +16,6 @@ SELECT [JobSource]
   (JobId = '02F271F3-0D40-4FA0-9328-C77EBCA59B6F' or JobId = '03CEE4B8-ECC1-4E57-95CE-FA430FE0DBFB' 
   or ResultMessage like '%completed with status%'
   or ResultMessage like '%back to Pending state with requeueDelay%'
-  or ResultMessage like '%Installed extension%')
-  or Result != 0
+  or ResultMessage like '%Installed extension%'
+  or Result != 0)
   order by StartTime desc
