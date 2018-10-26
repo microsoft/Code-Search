@@ -40,7 +40,6 @@ $ArtifactPaths = @{
     'AlmsearchPluginZipPath'      = "$PSScriptRoot\..\almsearchv5.zip";
     'AlmsearchAuthPluginZipPath'  = "$PSScriptRoot\..\almsearchauthpluginv5.zip";
     'ElasticsearchRelevancePath'  = "$PSScriptRoot\..\relevance.xml";
-    'ElasticsearchLoggingPath'    = "$PSScriptRoot\..\log4j2.properties";
 }
 
 $ElasticsearchServiceRetryConstants = @{

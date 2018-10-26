@@ -166,7 +166,6 @@ switch ($Operation.ToLower()) {
     -ElasticsearchZipPath $ArtifactPaths.ElasticsearchZipPath `
     -AlmsearchPluginZipPath $ArtifactPaths.AlmsearchPluginZipPath `
     -ElasticsearchRelevancePath $ArtifactPaths.ElasticsearchRelevancePath `
-    -ElasticsearchLoggingPath $ArtifactPaths.ElasticsearchLoggingPath `
     -ElasticsearchIndexPath $TFSSearchIndexPath `
     -Port $Port `
     -ServiceName $ServiceName `
@@ -180,7 +179,6 @@ switch ($Operation.ToLower()) {
     'update' { UpdateTFSElasticsearch -ElasticsearchZipPath $ArtifactPaths.ElasticsearchZipPath `
     -AlmsearchPluginZipPath $ArtifactPaths.AlmsearchPluginZipPath `
     -ElasticsearchRelevancePath $ArtifactPaths.ElasticsearchRelevancePath `
-    -ElasticsearchLoggingPath $ArtifactPaths.ElasticsearchLoggingPath `
     -ServiceName $ServiceName `
     -IgnoreEnvironmentVariable:$IgnoreEnvironmentVariable `
 	-User $User `

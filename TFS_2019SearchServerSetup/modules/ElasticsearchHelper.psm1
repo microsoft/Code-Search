@@ -13,8 +13,7 @@ function CopyElasticsearchArtifacts
         [string] $ElasticsearchInstallPath,
         [string] $ElasticsearchZipPath,
         [string] $AlmsearchPluginZipPath,
-        [string] $ElasticsearchRelevancePath,
-        [string] $ElasticsearchLoggingPath
+        [string] $ElasticsearchRelevancePath
     )
     
     ExtractFiles $ElasticsearchZipPath $ElasticsearchInstallPath -Verbose:$VerbosePreference
@@ -23,11 +22,6 @@ function CopyElasticsearchArtifacts
     $esRelevanceInstallPath = Join-Path $ElasticsearchInstallPath $ElasticsearchConfigConstants.ElasticsearchConfigPath
     LogVerbose "Copying $ElasticsearchRelevancePath to $esRelevanceInstallPath"
     Copy-Item $ElasticsearchRelevancePath $esRelevanceInstallPath
-
-    #copy logging config file
-    $esLoggingInstallPath = Join-Path $ElasticsearchInstallPath $ElasticsearchConfigConstants.ElasticsearchConfigPath
-    LogVerbose "Copying $ElasticsearchLoggingPath to $esLoggingInstallPath"
-    Copy-Item $ElasticsearchLoggingPath $esLoggingInstallPath
 }
 
 function StageElasticsearch
@@ -47,9 +41,6 @@ function StageElasticsearch
 
         .PARAMETER ElasticsearchRelevancePath
         path of relevance.xml
-
-        .PARAMETER ElasticsearchLoggingPath
-        path of log4j2.properties
 
         .PARAMETER ElasticsearchIndexPath
         path where indices will be stored
@@ -82,7 +73,6 @@ function StageElasticsearch
         [string] $ElasticsearchZipPath,
         [string] $AlmsearchPluginZipPath,
         [string] $ElasticsearchRelevancePath,
-        [string] $ElasticsearchLoggingPath,
         [string] $ElasticsearchIndexPath,
         [int] $Port,
         [switch] $IgnoreEnvironmentVariable,
@@ -129,7 +119,7 @@ function StageElasticsearch
         }
     }
     
-    if (-not (InvokeFunction { CopyElasticsearchArtifacts $ElasticsearchInstallPath $ElasticsearchZipPath $AlmsearchPluginZipPath $ElasticsearchRelevancePath $ElasticsearchLoggingPath -ErrorAction Stop -Verbose:$VerbosePreference}))
+    if (-not (InvokeFunction { CopyElasticsearchArtifacts $ElasticsearchInstallPath $ElasticsearchZipPath $AlmsearchPluginZipPath $ElasticsearchRelevancePath -ErrorAction Stop -Verbose:$VerbosePreference}))
     {
         return $false
     }

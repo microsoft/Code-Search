@@ -141,7 +141,6 @@ function InstallTFSElasticsearch
         [string] $ElasticsearchZipPath,
         [string] $AlmsearchPluginZipPath,
         [string] $ElasticsearchRelevancePath,
-        [string] $ElasticsearchLoggingPath,
         [string] $ElasticsearchIndexPath,
         [int] $Port,
         [string] $ServiceName,
@@ -169,7 +168,7 @@ function InstallTFSElasticsearch
         [scriptblock[]]$stages = @()
         $stages += { AddServiceAccountToSecurityGroup $serviceAccount -Verbose:$VerbosePreference }
         $stages += { IsSupportedJavaInstalled -Verbose:$VerbosePreference }
-        $stages += { StageElasticsearch $ElasticsearchInstallPath $ElasticsearchZipPath $AlmsearchPluginZipPath $ElasticsearchRelevancePath $ElasticsearchLoggingPath $ElasticsearchIndexPath $Port -IgnoreEnvironmentVariable:$IgnoreEnvironmentVariable $ClusterName $User $Password -Verbose:$VerbosePreference }
+        $stages += { StageElasticsearch $ElasticsearchInstallPath $ElasticsearchZipPath $AlmsearchPluginZipPath $ElasticsearchRelevancePath $ElasticsearchIndexPath $Port -IgnoreEnvironmentVariable:$IgnoreEnvironmentVariable $ClusterName $User $Password -Verbose:$VerbosePreference }
         $stages += { InstallElasticsearch $serviceBatPath $ServiceName $serviceAccount -Verbose:$VerbosePreference }
         $stages += { SetPermissions $ElasticsearchInstallPath $ElasticsearchIndexPath $env:JAVA_HOME $ServiceName $serviceAccount }
         $stages += { InstallElasticsearchPlugin $pluginBatPath $ElasticsearchConfigConstants.AlmsearchPlugin $ArtifactPaths.AlmsearchPluginZipPath -Verbose:$VerbosePreference }
@@ -277,7 +276,6 @@ function UpdateTFSElasticsearch
         [string] $ElasticsearchZipPath,
         [string] $AlmsearchPluginZipPath,
         [string] $ElasticsearchRelevancePath,
-        [string] $ElasticsearchLoggingPath,
         [string] $ServiceName,
         [switch] $IgnoreEnvironmentVariable,
         [string] $User,
@@ -386,7 +384,6 @@ function UpdateTFSElasticsearch
     -ElasticsearchZipPath $ElasticsearchZipPath `
     -AlmsearchPluginZipPath $AlmsearchPluginZipPath `
     -ElasticsearchRelevancePath $ElasticsearchRelevancePath `
-    -ElasticsearchLoggingPath $ElasticsearchLoggingPath `
     -ElasticsearchIndexPath $ElasticsearchIndexPath `
     -Port $Port `
     -ServiceName $ServiceName `
