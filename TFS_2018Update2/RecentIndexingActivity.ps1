@@ -15,7 +15,7 @@ Param(
     [Parameter(Mandatory=$True, Position=4, HelpMessage="Enter the days since last indexing was triggered for this collection")]
     [string]$Days,
     
-    [Parameter(Mandatory=$False, Position=5, HelpMessage="Trigger collection indexing for Code, WorkItem or All")]
+    [Parameter(Mandatory=$False, Position=5, HelpMessage="Trigger collection indexing for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
 )
 
