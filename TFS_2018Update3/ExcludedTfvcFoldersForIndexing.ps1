@@ -12,18 +12,16 @@ Param(
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName,
     
-	[Parameter(Mandatory=$True, Position=4, HelpMessage="Enter operation type 'Add' for adding more folders, 'Delete' for deleting all the folders in the list, 'Fetch' for fetching list of folders present in exclusion list.")]
-    [string]$OperationType,
-	
-    [Parameter(Mandatory=$True, Position=5, HelpMessage="Specify comma separated list of folders to Add/Remove from Indexing. This is ignored for 'Delete' and 'Fetch' Operation")][AllowEmptyString()]
-    [string]$CommaSeparatedFoldersToAddForAddOperation
+	[Parameter(Mandatory=$True, Position=4, HelpMessage="Enter operation type 'Add' for adding more folder(s), 'Remove' for removing folder(s) from exclusion list, 'Delete' for deleting all the folders in the list, 'Fetch' for fetching list of folders present in exclusion list.")]
+    [string]$OperationType
 )
 
 Import-Module .\Common.psm1 -Force
 
 function AddExcludedFolders
 {
-	$Params = "CollectionId='$CollectionID'", "FolderPaths='$CommaSeparatedFoldersToAddForAddOperation'"
+	$foldersList = Read-Host 'Specify comma separated list of folders to Exclude from Indexing'
+	$Params = "CollectionId='$CollectionID'", "FolderPaths='$foldersList'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\AddFoldersInExclusionList.sql'
 	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params
 	Write-Host "Added Given folders to Indexing Exclusion list" -ForegroundColor Yellow
@@ -39,12 +37,21 @@ function FetchExcludedFoldersList
 	Write-Host "Folders present in Indexing Exclusion list are: '$ExcludedFoldersList'" -ForegroundColor Yellow
 }
 
+function RemoveFoldersFromExclusionList
+{
+	$foldersList = Read-Host 'Specify comma separated list of folders to remove from Indexing Exclusion list'
+	$Params = "CollectionId='$CollectionID'", "FolderPaths='$foldersList'"
+	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\RemoveFoldersFromExclusionList.sql'
+	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params
+	Write-Host "Removed given folders from Indexing Exclusion list" -ForegroundColor Yellow
+}
+
 function DeleteAllExcludedFolders
 {
 	$Params = "CollectionId='$CollectionID'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\DeleteAllFoldersInExclusionList.sql'
 	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params
-	Write-Host "Added Given folders to Indexing Exclusion list" -ForegroundColor Yellow
+	Write-Host "Deleted all folders from Indexing Exclusion list" -ForegroundColor Yellow
 }
 
 [System.ENVIRONMENT]::CurrentDirectory = $PWD
@@ -65,11 +72,16 @@ switch ($OperationType)
             Write-Host "Fetching folders present in exclusion list..." -ForegroundColor Green
             FetchExcludedFoldersList
         }
-    "Delete"
+    "Remove"
         {
-            Write-Host "Deleting all the folders from exclusion list..." -ForegroundColor Green
-            DeleteAllExcludedFolders
+            Write-Host "Removing given folders from exclusion list..." -ForegroundColor Green
+            RemoveFoldersFromExclusionList
         }
+    "Delete"
+		{
+			Write-Host "Deleting all the folders from exclusion list..." -ForegroundColor Green
+			DeleteAllExcludedFolders
+		}
 }
 
 Pop-Location

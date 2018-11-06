@@ -12,7 +12,7 @@ Param(
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName,
     
-    [Parameter(Mandatory=$False, Position=4, HelpMessage="Trigger collection indexing for Code, WorkItem or All")]
+    [Parameter(Mandatory=$False, Position=4, HelpMessage="Trigger collection indexing for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
 )
 

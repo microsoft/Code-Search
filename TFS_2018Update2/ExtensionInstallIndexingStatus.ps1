@@ -15,7 +15,7 @@ Param(
     [Parameter(Mandatory=$True, Position=4, HelpMessage="Enter the days since last indexing was triggered for this collection")]
     [string]$Days,
     
-    [Parameter(Mandatory=$False, Position=5, HelpMessage="Extension install indexing state for Code, WorkItem or All")]
+    [Parameter(Mandatory=$False, Position=5, HelpMessage="Extension install indexing state for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
 )
 
