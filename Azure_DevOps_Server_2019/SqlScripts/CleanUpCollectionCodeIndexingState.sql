@@ -19,6 +19,13 @@ DELETE FROM [Search].[tbl_IndexingUnitChangeEvent]
 	)
 	AND PartitionId > 0
 
-DELETE FROM [Search].[tbl_JobYield] WHERE PartitionId > 0
+DELETE FROM [Search].[tbl_ItemLevelFailures]
+	WHERE IndexingUnitId in 
+	(
+		SELECT IndexingUnitId FROM [Search].[tbl_IndexingUnit] WHERE EntityType = 'Code' and PartitionId > 0
+	)
+	AND PartitionId > 0
 
-DELETE FROM [Search].[tbl_TreeStore] WHERE PartitionId > 0
+TRUNCATE TABLE [Search].[tbl_DisabledFiles]
+TRUNCATE TABLE [Search].[tbl_JobYield]
+DELETE FROM [Search].[tbl_IndexingUnit] WHERE EntityType = 'Code' AND PartitionId > 0
