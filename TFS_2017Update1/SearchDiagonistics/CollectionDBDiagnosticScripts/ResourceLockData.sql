@@ -1,0 +1,5 @@
+SELECT [ResourceName]
+      ,[LockMode]
+      ,[LockOwner]
+      ,[LeaseId]
+FROM [Search].[tbl_ResourceLockTable]

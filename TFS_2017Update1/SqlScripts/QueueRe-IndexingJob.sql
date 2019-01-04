@@ -1,4 +1,4 @@
-/** This sql script is used to queue the Code Repair Job in case of fresh indexing of the repository of the given collection id.
+/** This sql script is used to queue the Code Repair Job in case of fresh indexing of the repostiory of the given collection id.
   * Update the Collection id in the variable under the comment **UPDATE**
   * DATABASE : CONFIGURATION DB
   **/

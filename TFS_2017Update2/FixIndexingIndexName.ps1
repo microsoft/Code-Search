@@ -2,13 +2,13 @@
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
-
+   
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Collection Database name.")]
     [string]$CollectionDatabaseName,
-
+    
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
-
+   
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
     [string]$CollectionName
 )

@@ -1,25 +1,2 @@
-***************************************************************************************************
-To analyze Search issue in Team Foundation Server, please share the following data as listed below
-***************************************************************************************************
-
-1. Share TFS/Search Configuration log. Note that the below folder could be hidden. So enable viewing hidden items first.
-   <DriveLocation>:\ProgramData\Microsoft\Team Foundation\Server Configuration\Logs
-
-2. Share ElasticSearch logs
-   <ElasticSearchFolderLocation>\elasticsearch-2.4.1\logs
-
-3. Share Configuration Database status for Search
-   Run script .\ConfigurationDBSearchDiagnostics.ps1
-   Diagnostics data will be generated in $ConfigurationDatabaseName_Diagnostic.zip
-
-4. Share Collection Database status for Search
-   For each Collection (that needs analysis), run script .\CollectionDBSearchDiagnostics.ps1
-   Diagnostics data will be generated in $CollectionDatabaseName_Diagnostic.zip
-
-5. Share Elasticsearch service status
-   Refer REST calls listed in .\ESStatus.txt
-
-____________________________________________________________________________________________________
-      
-  
-
+Navigate one level up from the directory containing this file and follow the instructions in <Affected TFS version>\SearchDiagnostics\README.txt file.
+For example, if you want to report a Search issue in TFS 2018 Update 2, follow the instructions in TFS_2018Update2\SearchDiagnostics\README.txt file.
