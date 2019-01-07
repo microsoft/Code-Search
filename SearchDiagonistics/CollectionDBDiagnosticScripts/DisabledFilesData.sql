@@ -1,7 +1,0 @@
-SELECT [RepositoryId]
-      ,[BranchName]
-      ,[FilePath]
-      ,[DisableReason]
-      ,[ContentHash]
-      ,[LastUpdatedTimeStamp]
-FROM [Search].[tbl_DisabledFiles]
