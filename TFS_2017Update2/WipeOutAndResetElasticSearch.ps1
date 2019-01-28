@@ -80,7 +80,7 @@ if(IsResetConfirm($message))
         Push-Location
 
         cd $servicePath
-        $outputService = .\Service.bat stop 
+        $outputService = .\elasticsearch-service.bat stop 
         Write-Host $outputService -ForegroundColor Yellow
         if($outputService -like '*failed*')
         {
@@ -93,7 +93,7 @@ if(IsResetConfirm($message))
 
             Write-Host "Cleaned up the index folder $ESIndexLocation" -ForegroundColor Green
 
-            $outputService = .\Service.bat start
+            $outputService = .\elasticsearch-service.bat start
             Write-Host $outputService -ForegroundColor Yellow
         }
 
