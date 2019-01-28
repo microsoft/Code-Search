@@ -9,7 +9,19 @@ Based on the version of TFS that you are using, please select an appropriate opt
 
 [TFS 2017 RTW](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2017%20RTW.md)
 
+[TFS 2017 Update 1](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2017Update1.md)
 
+[TFS 2017 Update 2](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2017Update2.md)
 
+[TFS 2017 Update 3](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2017Update3.md)
 
+[TFS 2018 RTW](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2018RTW.md)
+
+[TFS 2018 Update 1](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2018Update1.md)
+
+[TFS 2018 Update 2](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2018Update2.md)
+
+[TFS 2018 Update 3](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2018Update3.md)
+
+[Azure DevOps Server 2019](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/Azure_DevOps_Server_2019.md)
 
