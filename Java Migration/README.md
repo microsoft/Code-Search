@@ -5,7 +5,7 @@ Oracle Java SE 8 is undergoing the “End of Public Updates” process, which me
 Below diagram captures the overall flow of steps invloved in migrating to Azul Zulu OpenJDK from Oracle JRE. 
 ![Migration Flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow1.png)
 
-Based on the version of TFS that you are using, please select the appropriate option below to proceed. 
+Based on the version of TFS that you are using, please select an appropriate option below to proceed. 
 
 
 
