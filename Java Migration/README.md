@@ -7,6 +7,9 @@ Below diagram captures the overall flow of steps invloved in migrating to Azul Z
 
 Based on the version of TFS that you are using, please select an appropriate option below to proceed. 
 
+[TFS 2017 RTW](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/TFS_2017%20RTW.md)
+
+
 
 
 
