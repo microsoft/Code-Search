@@ -3,24 +3,28 @@ Below diagram explains the steps to migrate from Oracle JRE to Azul Zulu OpenJDK
 ![Java Migration flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow2.png)
 
 ## Step 1: Pause Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 RTW, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017RTW. To pause all indexing, execute the script PauseSearchIndexing.ps1 from Windows PowerShell with administrative privileges. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 RTW, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017RTW. To pause all indexing, execute the script PauseSearchIndexing.ps1 on TFS server machine from Windows PowerShell with administrative privileges. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
 
 ## Step 2: Stop Elasticsearch Service
 Open Command Prompt as an administrator 
+
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
-For TFS 2017 RTM, cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
+cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Stop the service:
-For TFS 2017, execute "service.bat stop"
+execute "service.bat stop"
 
 ## Step 3: Remove Elasticsearch Service
 Open Command Prompt as an administrator 
+
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
-For TFS 2017 RTM, cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
+cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Remove the service:
-For TFS 2017, execute "service.bat remove"
+execute "service.bat remove"
 
 ## Step 4: Download and Install Azul Zulu Java 
 Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-jdk7.0.201-win_x64.msi)
@@ -30,17 +34,21 @@ Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-
 
 ## Step 6: Install Elasticsearch Service
 Open Command Prompt as an administrator 
+
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
-For TFS 2017 RTM, cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
+cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Install the service:
-For TFS 2017, execute "service.bat install"
+execute "service.bat install"
 
 ## Step 7: Start Elasticsearch Service
 Open Command Prompt as an administrator 
+
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
-For TFS 2017 RTM, cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
+cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Start the service:
-For TFS 2017, execute "service.bat start"
+execute "service.bat start"
 
 ## Step 8: Resume Search indexing
 Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 RTW, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017RTW. If indexing was paused, execute the script ResumeSearchIndexing.ps1 with administrative privileges, to resume indexing again. You will be prompted to enter:
