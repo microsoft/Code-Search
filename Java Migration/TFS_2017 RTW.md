@@ -11,8 +11,8 @@ Go to https://github.com/Microsoft/Code-Search and find the right folder based o
 ## Step 2: Stop Elasticsearch Service
 Open Command Prompt as an administrator 
 
-If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder and for remote search installations, locate the ES installation path and change the directory accordingly.
-### Change directory for local ES installation: 
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
+### Change directory: 
 cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Stop the service:
 execute "service.bat stop"
@@ -20,7 +20,7 @@ execute "service.bat stop"
 ## Step 3: Remove Elasticsearch Service
 Open Command Prompt as an administrator 
 
-If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder and for remote search installations, locate the ES installation path and change the directory accordingly.
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
 cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Remove the service:
@@ -35,8 +35,7 @@ Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-
 ## Step 6: Install Elasticsearch Service
 Open Command Prompt as an administrator 
 
-
-If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder and for remote search installations, locate the ES installation path and change the directory accordingly.
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
 cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Install the service:
@@ -45,7 +44,7 @@ execute "service.bat install"
 ## Step 7: Start Elasticsearch Service
 Open Command Prompt as an administrator 
 
-If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder and for remote search installations, locate the ES installation path and change the directory accordingly.
+If Elasticsearch is installed on the same server as TFS (local installation), use below command to locate ES folder. For remote search installations, locate the ES installation path and change the directory accordingly.
 ### Change directory: 
 cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-1.7.1-SNAPSHOT\bin"
 ### Start the service:
