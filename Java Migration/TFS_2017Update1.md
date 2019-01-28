@@ -34,27 +34,7 @@ cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsear
 execute "service.bat start"
 
 ## Step 6: Resume Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 RTW, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017RTW. If indexing was paused, execute the script ResumeSearchIndexing.ps1 with administrative privileges, to resume indexing again. You will be prompted to enter:
-
-* The SQL server instance name where the TFS configuration database resides.
-* The name of the TFS configuration database.
-
-
-## Step 3: Download and Install Azul Zulu Java 
-Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-jdk7.0.201-win_x64.msi)
-
-## Step 4: Update JAVA_HOME with Azul Zulu path
-![Update Java Home](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/java_home.png)
-
-## Step 5: Start Elasticsearch Service
-Open Command Prompt as an administrator 
-### Change directory: 
-cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsearch-2.4.1\bin"
-### Start the service:
-Execute "service.bat start"
-
-## Step 8: Resume Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 Update 1, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017Update1. If indexing was paused, execute the script ResumeSearchIndexing.ps1 with administrative privileges, to resume indexing again. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 Update 1, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017Update1. Execute the script ResumeSearchIndexing.ps1 with administrative privileges to resume indexing again. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
