@@ -23,7 +23,7 @@ execute "elasticsearch-service.bat stop"
 Download and install [OpenJDK 8u201](https://cdn.azul.com/zulu/bin/zulu8.34.0.1-ca-jdk8.0.201-win_x64.msi)
 
 ## Step 4: Update JAVA_HOME with Azul Zulu path
-![Update Java Home](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/java_home.png)
+![Update Java Home](java_home.png)
 
 ## Step 5: Start Elasticsearch Service
 Open Command Prompt as an administrator 
