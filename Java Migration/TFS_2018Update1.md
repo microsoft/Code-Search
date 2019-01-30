@@ -2,7 +2,7 @@
 
 Below diagram explains the steps to migrate from Oracle JRE to Azul Zulu OpenJDK for TFS 2018 Update 1.
 
-![Java Migration flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow1.png)
+![Java Migration flow](flow1.png)
 
 ## Step 1: Pause Search indexing
 Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2018 Update 1, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2018Update1. To pause all indexing, execute the script PauseSearchIndexing.ps1 from Windows PowerShell with administrative privileges. You will be prompted to enter:
@@ -23,7 +23,7 @@ execute "elasticsearch-service.bat stop"
 Download and install [OpenJDK 8u201](https://cdn.azul.com/zulu/bin/zulu8.34.0.1-ca-jdk8.0.201-win_x64.msi)
 
 ## Step 4: Update JAVA_HOME with Azul Zulu path
-![Update Java Home](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/java_home.png)
+![Update Java Home](java_home.png)
 
 ## Step 5: Start Elasticsearch Service
 Open Command Prompt as an administrator 
