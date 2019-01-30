@@ -2,7 +2,7 @@
 
 Below diagram explains the steps to migrate from Oracle JRE to Azul Zulu OpenJDK for Azure DevOps Server 2019.
 
-![Java Migration flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow1.png)
+![Java Migration flow](flow1.png)
 
 ## Step 1: Pause Search indexing
 Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For Azure DevOps Server 2019, go to https://github.com/Microsoft/Code-Search/tree/master/Azure_DevOps_Server_2019. To pause all indexing, execute the script PauseSearchIndexing.ps1 from Windows PowerShell with administrative privileges. You will be prompted to enter:
