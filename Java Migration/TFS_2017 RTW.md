@@ -39,7 +39,7 @@ execute "service.bat install"
 execute "service.bat start"
 
 ## Step 8: Resume Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 RTW, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017RTW. If indexing was paused, execute the script ResumeSearchIndexing.ps1 with administrative privileges, to resume indexing again. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. In this case, go to [TFS 2017 RTW](../TFS_2017RTW). If indexing was paused, execute the script ResumeSearchIndexing.ps1 with administrative privileges, to resume indexing again. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
