@@ -34,7 +34,7 @@ cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsear
 execute "elasticsearch-service.bat start"
 
 ## Step 6: Resume Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For TFS 2017 Update 1, go to https://github.com/Microsoft/Code-Search/tree/master/TFS_2017Update1. Execute the script ResumeSearchIndexing.ps1 with administrative privileges to resume indexing again. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. In this case, go to [TFS 2017 Update1](../TFS_2017Update1). Execute the script ResumeSearchIndexing.ps1 with administrative privileges to resume indexing again. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
