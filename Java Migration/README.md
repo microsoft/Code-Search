@@ -6,7 +6,7 @@ Note that while users with Oracle Java subscription will get automatic updates, 
 
 
 Below diagram captures the overall flow of steps invloved in migrating to Azul Zulu OpenJDK from Oracle JRE. 
-![Migration Flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow1.png)
+![Migration Flow](flow1.png)
 
 Based on the version of TFS that you are using, please select an appropriate option below to proceed. 
 
