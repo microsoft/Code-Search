@@ -3,7 +3,7 @@ Below diagram explains the steps to migrate from Oracle JRE to Azul Zulu OpenJDK
 ![Java Migration flow](flow2.png)
 
 ## Step 1: Pause Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. In this case, go to [TFS 2017 RTW](TFS_2017%20RTW.md). To pause all indexing, execute the script PauseSearchIndexing.ps1 on TFS server machine from Windows PowerShell with administrative privileges. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. In this case, go to [TFS 2017 RTW](../TFS_2017RTW). To pause all indexing, execute the script PauseSearchIndexing.ps1 on TFS server machine from Windows PowerShell with administrative privileges. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
