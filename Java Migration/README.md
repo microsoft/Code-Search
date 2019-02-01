@@ -1,6 +1,9 @@
 ## Steps for migrating to Azul Zulu OpenJDK from Oracle JRE
 
-Search feature of Azure DevOps Server uses Elasticsearch which depends on Java Runtime Environment (JRE). Up until now, Oracle JRE was the supported version of JRE.  Given the updates to Oracle Java licensing terms which now requires one to buy a subscription to continue to get updates to JRE for commercial use, Azure DevOps Server Search will support Azul Zulu OpenJDK so that our users have an option to choose between Azul Zulu OpenJDK and Oracle JRE, a decision they can make based on their business needs.
+The search feature of Team Foundation Server (TFS) uses Elasticsearch, which depends on Java SE. Until now  , Oracle Java SE was the supported version of JRE for TFS search. With the change in Oracle licensing terms, [there will be no more “free public Java updates”](https://www.oracle.com/technetwork/java/java-se-support-roadmap.html) and users are required to buy a subscription to continue to get JRE updates for commercial use. TFS Search will support both Azul Zulu OpenJDK and Oracle JRE, allowing you to choose between them based on your needs. 
+
+Note that while users with Oracle Java subscription will get automatic updates, Azul Zulu OpenJDK community version is a volunteer driven effort with no dedicated commercial support and updates. If you require dedicated commercial support to Azul Zulu OpenJDK, please contact Azul for more details on [Zulu Enterprise](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-enterprise-java-support-options/). 
+
 
 Below diagram captures the overall flow of steps invloved in migrating to Azul Zulu OpenJDK from Oracle JRE. 
 ![Migration Flow](https://github.com/msftazdev/Code-Search/blob/msftazdev-patch-1/Java%20Migration/flow1.png)
