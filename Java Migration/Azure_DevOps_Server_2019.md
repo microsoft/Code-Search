@@ -35,7 +35,7 @@ cd "C:\Program Files\Azure DevOps Server 2019\Search\ES\elasticsearchv5\bin"
 execute "elasticsearch-service.bat start"
 
 ## Step 6: Resume Search indexing
-Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. For Azure DevOps Server 2019, go to https://github.com/Microsoft/Code-Search/tree/master/Azure_DevOps_Server_2019. Execute the script ResumeSearchIndexing.ps1 with administrative privileges to resume indexing again. You will be prompted to enter:
+Go to https://github.com/Microsoft/Code-Search and find the right folder based on the TFS version you are using. In this case, go to [Azure_DevOps_Server_2019](../Azure_DevOps_Server_2019). Execute the script ResumeSearchIndexing.ps1 with administrative privileges to resume indexing again. You will be prompted to enter:
 
 * The SQL server instance name where the TFS configuration database resides.
 * The name of the TFS configuration database.
