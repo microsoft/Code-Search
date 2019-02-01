@@ -19,7 +19,7 @@ cd "C:\Program Files\Microsoft Team Foundation Server 15.0\Search\ES\elasticsear
 execute "elasticsearch-service.bat stop"
 
 ## Step 3: Download and Install Azul Zulu Java 
-Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-jdk7.0.201-win_x64.msi)
+Download and install [OpenJDK 8u201](https://cdn.azul.com/zulu/bin/zulu8.34.0.1-ca-jdk8.0.201-win_x64.msi)
 
 ## Step 4: Update JAVA_HOME with Azul Zulu path
 ![Update Java Home](java_home.png)
