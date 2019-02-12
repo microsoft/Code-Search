@@ -6,7 +6,7 @@ Param(
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
     
-    [Parameter(Mandatory=$False, Position=2, HelpMessage="Pause Indexing for Code, WorkItem or All.")]
+    [Parameter(Mandatory=$False, Position=2, HelpMessage="Pause Indexing for Code, WorkItem, Wiki or All.")]
     [string]$EntityType = "All"
 )
 
@@ -38,6 +38,12 @@ function PauseWorkItemIndexing
     Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  
 }
 
+function PauseWikiIndexing
+{
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\PauseWikiIndexing.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  
+}
+
 Write-Host "This would pause indexing for all the collections. Do you want to continue - Yes or No? " -NoNewline -ForegroundColor Magenta
 $userInput = Read-Host
 
@@ -51,10 +57,11 @@ if($userInput -like "Yes")
     {
         "All" 
             {
-                Write-Host "Pausing indexing for Code and WorkItem..." -ForegroundColor Green
+                Write-Host "Pausing indexing for Code, WorkItem and Wiki..." -ForegroundColor Green
                 PauseCodeIndexing
                 PauseWorkItemIndexing
-                Write-Host "Code and WorkItem Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
+                PauseWikiIndexing
+                Write-Host "Code, WorkItem and Wiki Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
             }
         "WorkItem" 
             {
@@ -68,9 +75,15 @@ if($userInput -like "Yes")
                 PauseCodeIndexing
                 Write-Host "Code Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
             }
+        "Wiki"
+            {
+                Write-Host "Pausing indexing for Wiki..." -ForegroundColor Green
+                PauseWikiIndexing
+                Write-Host "Wiki Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
+            }
         default 
             {
-                Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
+                Write-Host "Enter a valid EntityType i.e. Code, WorkItem, Wiki or All" -ForegroundColor Red
             }
     }
 
