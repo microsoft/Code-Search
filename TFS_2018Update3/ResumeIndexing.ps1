@@ -6,7 +6,7 @@ Param(
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Configuration DB")]
     [string]$ConfigurationDatabaseName,
     
-    [Parameter(Mandatory=$False, Position=2, HelpMessage="Resume Indexing for Code, WorkItem or All")]
+    [Parameter(Mandatory=$False, Position=2, HelpMessage="Resume Indexing for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
 )
 
@@ -22,6 +22,13 @@ function ResumeWorkItemIndexing
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWorkItemIndexing.sql'
     Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
     Write-Host "WorkItem Indexing has been resumed!!" -ForegroundColor Green
+}
+
+function ResumeWikiIndexing
+{
+    $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWikiIndexing.sql'
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+    Write-Host "Wiki Indexing has been resumed!!" -ForegroundColor Green
 }
 
 function ImportSQLModule
@@ -48,9 +55,10 @@ switch ($EntityType)
 {
     "All" 
         {
-            Write-Host "Resuming indexing for Code and WorkItem..." -ForegroundColor Green
+            Write-Host "Resuming indexing for Code, WorkItem and Wiki..." -ForegroundColor Green
             ResumeCodeIndexing
             ResumeWorkItemIndexing
+            ResumeWikiIndexing
         }
     "WorkItem" 
         {
@@ -61,10 +69,15 @@ switch ($EntityType)
         {
             Write-Host "Resuming indexing for Code..." -ForegroundColor Green
             ResumeCodeIndexing
+        }		
+    "Wiki"
+        {
+            Write-Host "Resuming indexing for Wiki..." -ForegroundColor Green
+            ResumeWikiIndexing
         }
     default 
         {
-            Write-Host "Enter a valid EntityType i.e. Code or WorkItem or All" -ForegroundColor Red
+            Write-Host "Enter a valid EntityType i.e. Code, WorkItem, Wiki or All" -ForegroundColor Red
         }
 }
 
