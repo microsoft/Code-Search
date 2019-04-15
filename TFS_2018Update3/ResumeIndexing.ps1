@@ -70,11 +70,11 @@ switch ($EntityType)
             Write-Host "Resuming indexing for Code..." -ForegroundColor Green
             ResumeCodeIndexing
         }		
-    "Wiki"
-        {
+	"Wiki"
+		{
             Write-Host "Resuming indexing for Wiki..." -ForegroundColor Green
             ResumeWikiIndexing
-        }
+		}
     default 
         {
             Write-Host "Enter a valid EntityType i.e. Code, WorkItem, Wiki or All" -ForegroundColor Red

@@ -1,0 +1,53 @@
+[2019-04-12T17:57:02Z][Info] === Start Repair-Search ===
+[2019-04-12T17:57:02Z][Info] ======================================================================================
+[2019-04-12T17:57:02Z][Info] Executing analyzer [Test-SqlHealth]...
+
+[2019-04-12T17:57:02Z][Info] Verifying IsSearchConfigured setting in Configuration DB...
+[2019-04-12T17:57:02Z][Info] Verifying Search URL settings in Configuration DB...
+[2019-04-12T17:57:02Z][Info] Verifying Code search extension is installed...
+[2019-04-12T17:57:02Z][Info] Verifying primary indexing feature flags...
+[2019-04-12T17:57:02Z][Info] Verifying Collection IU properties' Index and Query URL match the configuration DB connection URL...
+[2019-04-12T17:57:02Z][Info] Verifying Collection IU properties' ES ContractTypes for Indexing and Query...
+[2019-04-12T17:57:02Z][Info] No issues found!
+[2019-04-12T17:57:02Z][Info] ======================================================================================
+[2019-04-12T17:57:02Z][Info] Executing analyzer [Test-ElasticsearchHealth]...
+
+[2019-04-12T17:57:03Z][Info] Elasticsearch cluster health is [@{cluster_name=TFS_Search_BSARKAR; status=red; timed_out=False; number_of_nodes=1; number_of_data_nodes=1; active_primary_shards=0; active_shards=0; relocating_shards=0; initializing_shards=0; unassigned_shards=0; delayed_unassigned_shards=0; number_of_pending_tasks=0; number_of_in_flight_fetch=0; task_max_waiting_in_queue_millis=0; active_shards_percent_as_number=NaN}].
+[2019-04-12T17:57:03Z][Error] Elasticsearch cluster state is [red].
+[2019-04-12T17:57:03Z][Warn] Actions recommended are [Request-FixElasticsearchClusterState].
+[2019-04-12T17:57:03Z][Info] ======================================================================================
+[2019-04-12T17:57:03Z][Warn] Analysis is complete. Final list of recommended actions = [Request-FixElasticsearchClusterState].
+[2019-04-12T17:57:03Z][Info] ======================================================================================
+[2019-04-12T17:57:03Z][Info] Executing action [Request-FixElasticsearchClusterState]...
+[2019-04-12T17:57:05Z][Warn] [MANUAL ACTION REQUIRED] Analyse the cluster allocation explanation respose below and try to mitigate the problem. Sometimes this state can be temporary so execute Repair-Search again. If you are unable to fix the cluster state, contact support.
+{
+    "index":  "wiki_wikicontract_1421_shared_b0edd461-42e5-4498-afa8-8b050f575c4d",
+    "shard":  5,
+    "primary":  true,
+    "current_state":  "unassigned",
+    "unassigned_info":  {
+                            "reason":  "CLUSTER_RECOVERED",
+                            "at":  "2019-04-12T17:57:04.104Z",
+                            "last_allocation_status":  "awaiting_info"
+                        },
+    "can_allocate":  "yes",
+    "allocate_explanation":  "can allocate the shard",
+    "target_node":  {
+                        "id":  "MJsynAoYTveXKcpaFSKplg",
+                        "name":  "BSARKAR",
+                        "transport_address":  "127.0.0.1:9300"
+                    },
+    "allocation_id":  "Gh16xlo9SiKQPY25yhutmg",
+    "node_allocation_decisions":  [
+                                      {
+                                          "node_id":  "MJsynAoYTveXKcpaFSKplg",
+                                          "node_name":  "BSARKAR",
+                                          "transport_address":  "127.0.0.1:9300",
+                                          "node_decision":  "yes",
+                                          "store":  {
+                                                        "in_sync":  true,
+                                                        "allocation_id":  "Gh16xlo9SiKQPY25yhutmg"
+                                                    }
+                                      }
+                                  ]
+}
