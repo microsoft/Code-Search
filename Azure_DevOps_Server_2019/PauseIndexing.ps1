@@ -75,12 +75,12 @@ if($userInput -like "Yes")
                 PauseCodeIndexing
                 Write-Host "Code Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
             }
-        "Wiki"
-            {
+		"Wiki"
+			{
                 Write-Host "Pausing indexing for Wiki..." -ForegroundColor Green
                 PauseWikiIndexing
                 Write-Host "Wiki Indexing has been paused!! Run ResumeIndexing.ps1 to resume indexing." -ForegroundColor Green
-            }
+			}
         default 
             {
                 Write-Host "Enter a valid EntityType i.e. Code, WorkItem, Wiki or All" -ForegroundColor Red
