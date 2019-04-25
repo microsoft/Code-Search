@@ -181,7 +181,7 @@ try
     if ($totalActionsRecommended.Count -eq 0)
     {
         Write-Log "======================================================================================"
-        Write-Log "No known issues found. System seems to be healthy. If not, please contact support." -Level Attention
+        Write-Log "No known issues found. System seems to be healthy. If not, please collect diagnostic data by following steps in https://github.com/Microsoft/Code-Search/blob/master/Azure_DevOps_Server_2019/SearchDiagonistics/README.txt, and file an issue at https://developercommunity.visualstudio.com/content/problem/post.html?space=22." -Level Attention
         Write-Log "======================================================================================"
     }
     else
