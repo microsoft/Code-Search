@@ -78,7 +78,6 @@ function Test-SqlHealth
     $isExtensionInstalled = Test-ExtensionInstalled -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -EntityType $EntityType
     if (!$isExtensionInstalled)
     {
-        Write-Log "$EntityType search extension is not installed." -Level Error
         return "Request-InstallSearchExtension"
     }
 

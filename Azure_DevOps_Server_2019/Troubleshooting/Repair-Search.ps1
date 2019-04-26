@@ -228,7 +228,8 @@ catch [ArgumentException]
 }
 catch
 {
-    Write-Log "Repair-Search failed with exception: [$($_ | Out-String)]." -Level Error
+    $message = ("Message:`r`n" + ($_ | Out-String) + "`r`nStack Trace:`r`n" + ($_.ScriptStackTrace))
+    Write-Log "Repair-Search failed with following exception:`r`n$message" -Level Error
 }
 finally
 {

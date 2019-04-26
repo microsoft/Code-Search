@@ -34,11 +34,17 @@ function Test-FaultInJobInInfiniteRetries
     $faultInJobId = Get-AccountFaultInJobId -EntityType $EntityType
     $faultInJobResultMessage = Invoke-Sqlcmd -Query "SELECT TOP(1) ResultMessage FROM dbo.tbl_JobHistory WHERE JobSource = '$collectionId' AND JobId = '$faultInJobId' AND Result IN (0, 2) ORDER BY StartTime DESC" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty ResultMessage
 
-    # Check if it contains the message indicating it is waiting for extension uninstallation, and return action if required
+    # Check if it contains the message indicating it is waiting for extension uninstallation
     if ($faultInJobResultMessage -and $faultInJobResultMessage.Contains("Requeue the Account Fault-In job since Extension Uninstall sequence is still in progress"))
     {
-        Write-Log "$EntityType indexing is blocked due to incorrect values of some registry keys." -Level Error
-        return "Reset-ExtensionInstallationRegKeys"
+        # Check if the extension uninstallation in progress registry key is true
+        $regKey = "\Service\ALMSearch\Settings\IsExtensionOperationInProgress\$EntityType\Uninstalled"
+        $regValue = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -RegistryPath $regKey
+        if ($regValue -eq "True")
+        {
+            Write-Log "$EntityType indexing is blocked due to incorrect values of some registry keys." -Level Error
+            return "Reset-ExtensionInstallationRegKeys"
+        }
     }
 
     return @() # No actions identified
