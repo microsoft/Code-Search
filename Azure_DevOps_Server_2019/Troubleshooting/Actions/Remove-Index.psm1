@@ -36,25 +36,29 @@ function Remove-Index
     )
 
     $indexToRemove = $AdditionalParam
-    $indexExists = (Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Head -Command $indexToRemove -Verbose:$VerbosePreference).StatusCode -eq 200
-    if ($indexExists)
+    $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Head -Command $indexToRemove -Verbose:$VerbosePreference
+    if ($response.StatusCode -eq 200)
     {
         $message = "Delete index [$AdditionalParam] in Elasticsearch"
         if ($PSCmdlet.ShouldProcess($message.ToUpperInvariant(), "Are you sure you want to $($message)?".ToUpperInvariant(), "Confirm"))
         {
             $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Delete -Command $indexToRemove -Verbose:$VerbosePreference
-            if ($response.Status -eq 200)
+            if ($response.StatusCode -eq 200)
             {
                 Write-Log "Deleted index [$indexToRemove]."
             }
             else
             {
-                Write-Log "Deletion of Elasticsearch index failed with error: [$($response | Out-String)]."
+                Write-Log "Deletion of Elasticsearch index failed with error: [$($response | ConvertTo-Json)]."
             }
         }
     }
-    else
+    elseif ($response.StatusCode -eq 404)
     {
         Write-Log "Index [$indexToRemove] does not exist."
+    }
+    else
+    {
+        Write-Log "Index Exists API failed with error: [$($response | ConvertTo-Json)]."
     }
 }

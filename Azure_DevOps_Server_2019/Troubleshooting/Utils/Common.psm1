@@ -220,6 +220,11 @@ function Invoke-ElasticsearchCommand
     )
 
     $uri = "$ElasticsearchServiceUrl$Command"
+    Write-Log "Request Uri = [$uri]" -Level Verbose
+    if ($Body)
+    {
+        Write-Log "Request Body = [$Body]" -Level Verbose
+    }
 
     $content = $null
     $statusCode = $null
@@ -240,9 +245,12 @@ function Invoke-ElasticsearchCommand
     }
     catch
     {
-        if (!$_.Exception.Message.Contains("Unable to connect to the remote server"))
+        if (!$_.Exception.Message.Contains("Unable to connect to the remote server") -and !$_.Exception.Message.Contains("The operation has timed out"))
         {
-            $statusCode = $_.Exception.Response.StatusCode.value__
+            if ($_.Exception.Response -ne $null)
+            {
+                $statusCode = $_.Exception.Response.StatusCode.value__
+            }
         }
 
         $errorMsg = $_ | Out-String
@@ -272,13 +280,13 @@ function Confirm-ElasticsearchIsReachable
     )
 
     $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Head -Verbose:$VerbosePreference
-    if (!$response.StatusCode)
-    {
-        throw [ArgumentException]"An error occurred while establishing a connection to Elasticsearch service at [$ElasticsearchServiceUrl]. The service is either not installed or not in a started state."
-    }
-    elseif ($response.StatusCode -eq 403)
+    if ($response.StatusCode -eq 403)
     {
         throw [ArgumentException]"An error occurred while establishing a connection to Elasticsearch service at [$ElasticsearchServiceUrl]. The service is reachable but the credential provided is incorrect."
+    }
+    elseif ($response.StatusCode -ne 200)
+    {
+        throw [ArgumentException]"An error occurred while establishing a connection to Elasticsearch service at [$ElasticsearchServiceUrl]. Error message: [$($response.ErrorMessage)]."
     }
 }
 
@@ -300,35 +308,39 @@ function Remove-IndexedDocumentsInBatches
         [string] $Body
     )
 
-    $batchDeleteTimeout = "10s"
-    $timedOut = $false
-    do
+    $url = "$IndexPattern/_delete_by_query?refresh&wait_for_completion=false&conflicts=proceed"
+    $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Post -Command $url -Body $body
+    if ($response.StatusCode -eq 200)
     {
-        $url = "$IndexPattern/_delete_by_query?timeout=$batchDeleteTimeout"
-        $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Post -Command $url -Body $body
-        if ($response.StatusCode -eq 200)
+        $taskId = ($response.Content | ConvertFrom-Json).task
+        while ($true)
         {
-            $timedOut = [bool](($response.Content | ConvertFrom-Json).timed_out)
-            $docsDeleted = [int](($response.Content | ConvertFrom-Json)._indices._all.deleted)
-            $docsFound = [int](($response.Content | ConvertFrom-Json)._indices._all.found)
-            $docsRemaining = $docsFound - $docsDeleted
-            if ($timedOut)
+            Start-Sleep -Seconds 5
+
+            $taskResponse = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Get -Command "_tasks/$taskId"
+            if ($taskResponse.StatusCode -eq 200)
             {
-                Write-Log "Number of documents pending deletion = [$docsRemaining]. Reporting back in [$batchDeleteTimeout]..."
+                $taskResponseObject = $taskResponse.Content | ConvertFrom-Json
+                if ($taskResponseObject.completed -ne "true")
+                {
+                    Write-Log "Number of documents deleted till now is [$($taskResponseObject.task.status.deleted)/$($taskResponseObject.task.status.total)]."
+                }
+                else
+                {
+                    Write-Log "Deletion of documents is complete."
+                    return
+                }
             }
             else
             {
-                Write-Log "Number of documents pending deletion = [$docsRemaining]."
+                Write-Log "GET _tasks request failed with response: [$($taskResponse | ConvertTo-Json)]." -Level Error
             }
         }
-        else
-        {
-            Write-Log "Delete request failed with response: [$($response | Out-String)]." -Level Error
-        }
-
-        $url = "$IndexPattern/_refresh"
-        $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Post -Command $url
-    } while ($timedOut)
+    }
+    else
+    {
+        Write-Log "Delete request failed with response: [$($response | ConvertTo-Json)]." -Level Error
+    }
 }
 
 function Test-ExtensionInstalled
@@ -1040,6 +1052,7 @@ function Write-Log
         "Error" 
         {
             $foregroundColor = "Red"
+            $backgroundColor = "Black"
             break
         }
 

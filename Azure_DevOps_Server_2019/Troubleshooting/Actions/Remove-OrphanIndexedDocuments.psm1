@@ -82,7 +82,7 @@ function Remove-OrphanIndexedDocuments
         }
         else
         {
-            Write-Log "Delete request failed with response: [$($response | Out-String)]." -Level Error
+            Write-Log "Delete request failed with response: [$($response | ConvertTo-Json)]." -Level Error
         }
     }
     else

@@ -53,11 +53,15 @@ function Test-IndexingUnitPointsToDeletedIndex
         $indexNameInSql = $indexingIndexNames[0]
 
         # Check if the index exists in Elasticsearch. If not, recommend re-indexing
-        $indexExists = (Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Head -Command $indexNameInSql -Verbose:$VerbosePreference).StatusCode -eq 200
-        if (!$indexExists)
+        $response = Invoke-ElasticsearchCommand -ElasticsearchServiceUrl $ElasticsearchServiceUrl -ElasticsearchServiceCredential $ElasticsearchServiceCredential -Method Head -Command $indexNameInSql -Verbose:$VerbosePreference
+        if ($response.StatusCode -eq 404)
         {
             Write-Log "Indexing index name in SQL [$indexNameInSql] does not exist in Elasticsearch cluster at [$ElasticsearchServiceUrl]. Re-indexing is required." -Level Error
             return "Restart-Indexing"
+        }
+        elseif ($response.StatusCode -ne 200)
+        {
+            Write-Log "Index Exists API failed with error: [$($response | ConvertTo-Json)]."
         }
     }
     else
