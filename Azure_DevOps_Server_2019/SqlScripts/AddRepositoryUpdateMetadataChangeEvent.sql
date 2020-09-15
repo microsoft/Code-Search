@@ -59,7 +59,7 @@ SET @ChangeData = REPLACE(@ChangeData, '$CorrelationId', NEWID())
 DECLARE @Prerequisites nvarchar(max)
 SET @Prerequisites = '<IndexingUnitChangeEventPrerequisites i:nil="true" xmlns="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.Services.Search.Common" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"/>'
 
-DECLARE @ItemList Search.typ_IndexingUnitChangeEventDescriptorV2;
-INSERT INTO @ItemList values (@RepositoryIndexingUnitId, 'UpdateMetadata', @ChangeData, NULL, 'Pending', 0, @Prerequisites, NULL);
+DECLARE @ItemList Search.typ_IndexingUnitChangeEventDescriptorV3;
+INSERT INTO @ItemList values (@RepositoryIndexingUnitId, 'UpdateMetadata', @ChangeData, NULL, 'Pending', 0, @Prerequisites, NULL, 0);
 
 EXEC Search.prc_AddEntryForIndexingUnitChangeEvent @PartitionID, @ItemList
