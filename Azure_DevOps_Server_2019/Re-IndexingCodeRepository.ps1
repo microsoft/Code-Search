@@ -16,8 +16,11 @@ Param(
     [string]$CollectionName,
     
     [Parameter(Mandatory=$True, Position=5, HelpMessage="Update the tfvc/git repository name here.")]
-    [string]$RepositoryName
-)
+    [string]$RepositoryName,
+
+    [Parameter(Mandatory=$False, Position=5, HelpMessage="Set the name for the project of the repository here if there are multiple repositories with the same name.")]
+    [string]$ProjectName=""
+    )
 
 Import-Module .\Common.psm1 -Force
 
@@ -27,9 +30,13 @@ ImportSQLModule
 
 $CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
 
+if([string]::IsNullOrWhiteSpace($ProjectName)) {
+    $ProjectName = "" # make sure it's just an empty string if project name is null or whitespace
+}
+
 if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
 {
-    $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'"
+    $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'","ProjectName='$ProjectName'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddCodeRe-IndexingJobData.sql'
     Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
     Write-Host "Added the job data as '$addDataParams'" -ForegroundColor Cyan

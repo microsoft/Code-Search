@@ -16,13 +16,37 @@ DECLARE @RepositoryName nvarchar(max) = $(RepositoryName)
 -- Update the type of repository, use 'Git_Repository' for git repos and 'TFVC_Repository' for TFVC projects.
 DECLARE @RepositoryType varchar(30) = $(RepositoryType) 
 
+-- **UPDATE**
+-- Set the name for the project of the repository here if there are multiple repositories with the same name, this can be any string.
+DECLARE @ProjectName nvarchar(max) = $(ProjectName) 
+
 DECLARE @CollectionId uniqueidentifier = $(CollectionId)
 DECLARE @RepositoryId varchar(50)
 if(@IndexingUnitType <> 'Collection')
 BEGIN
-	SELECT @RepositoryId = TFSEntityId from Search.tbl_IndexingUnit
-		 where TFSEntityAttributes Like '%<RepositoryName>'+@RepositoryName+'</RepositoryName>%' and IndexingUnitType Like '%Repository%'
-		 and PartitionId > 0
+	if(@ProjectName <> '')
+	BEGIN
+		SELECT @RepositoryId = TFSEntityId
+			from [Search].[tbl_IndexingUnit] siu
+				inner join [dbo].[tbl_GitRepository] grp
+					on siu.PartitionId = grp.PartitionId
+						and siu.TFSEntityId = grp.RepositoryId
+						and siu.EntityType = 'Code'
+				inner join [dbo].[tbl_Dataspace] dsp
+					on grp.PartitionId = dsp.PartitionId
+						and grp.DataspaceId = dsp.DataspaceId
+				inner join [dbo].[tbl_projects] prj
+					on dsp.PartitionId = prj.PartitionId
+						and dsp.[DataspaceIdentifier] = prj.[project_id]
+			where grp.Name = @RepositoryName and IndexingUnitType Like '%Repository%' and prj.project_Name = @ProjectName
+			and siu.PartitionId > 0
+	END
+	ELSE
+	BEGIN
+		SELECT @RepositoryId = TFSEntityId from Search.tbl_IndexingUnit
+			where TFSEntityAttributes Like '%<RepositoryName>'+@RepositoryName+'</RepositoryName>%' and IndexingUnitType Like '%Repository%'
+			and PartitionId > 0
+	END
 
 	if(@RepositoryId is null)
 	BEGIN
