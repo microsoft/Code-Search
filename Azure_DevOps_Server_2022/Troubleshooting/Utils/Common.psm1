@@ -39,7 +39,7 @@ function Get-CollectionName
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [guid] $CollectionId
+        [guid] $CollectionId,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
