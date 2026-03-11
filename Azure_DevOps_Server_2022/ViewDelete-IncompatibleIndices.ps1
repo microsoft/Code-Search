@@ -1,4 +1,4 @@
-﻿<# 
+<# 
 Execute this script to identify any active indexes that are incompatible. If any indexes are in use, 
 reindex the collection using the TriggerCollection script, and then rerun this script with the Delete action selected.
 #>
@@ -22,6 +22,9 @@ param (
     [Parameter(Mandatory = $true, Position = 5, HelpMessage = "Action to perform.")]
     [ValidateSet("Delete", "View")]
     [string]$Action
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 $indicesFilePath = Join-Path $PSScriptRoot "indices.txt"
@@ -70,7 +73,7 @@ foreach ($index in $indices) {
         
         $Params = "IndexName='$indexName'"
         $sqlFullPath = Join-Path $PSScriptRoot 'SqlScripts\GetActiveIncompatibleIndex.sql'
-        $result = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Verbose -Variable $params
+        $result = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Verbose -Variable $params -TrustServerCertificate:$TrustServerCertificate
 
         Write-Host "Result: $($result.Count)" -ForegroundColor Red
 

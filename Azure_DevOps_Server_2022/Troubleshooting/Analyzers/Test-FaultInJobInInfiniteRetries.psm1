@@ -26,20 +26,23 @@ function Test-FaultInJobInInfiniteRetries
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
     
     # Get the latest fault-in job result message
-    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     $faultInJobId = Get-AccountFaultInJobId -EntityType $EntityType
-    $faultInJobResultMessage = Invoke-Sqlcmd -Query "SELECT TOP(1) ResultMessage FROM dbo.tbl_JobHistory WHERE JobSource = '$collectionId' AND JobId = '$faultInJobId' AND Result IN (0, 2) ORDER BY StartTime DESC" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty ResultMessage
+ $faultInJobResultMessage = Invoke-Sqlcmd -Query "SELECT TOP(1) ResultMessage FROM dbo.tbl_JobHistory WHERE JobSource = '$collectionId' AND JobId = '$faultInJobId' AND Result IN (0, 2) ORDER BY StartTime DESC" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate | Select-Object -ExpandProperty ResultMessage
 
     # Check if it contains the message indicating it is waiting for extension uninstallation
     if ($faultInJobResultMessage -and $faultInJobResultMessage.Contains("Requeue the Account Fault-In job since Extension Uninstall sequence is still in progress"))
     {
         # Check if the extension uninstallation in progress registry key is true
         $regKey = "\Service\ALMSearch\Settings\IsExtensionOperationInProgress\$EntityType\Uninstalled"
-        $regValue = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -RegistryPath $regKey
+        $regValue = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -RegistryPath $regKey -TrustServerCertificate:$TrustServerCertificate
         if ($regValue -eq "True")
         {
             Write-Log "$EntityType indexing is blocked due to incorrect values of some registry keys." -Level Error

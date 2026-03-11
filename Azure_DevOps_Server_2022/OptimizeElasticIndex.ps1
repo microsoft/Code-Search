@@ -5,6 +5,10 @@ Param(
 
     [Parameter(Mandatory=$True, HelpMessage="Enter index name. Eg: code* for all code indices or a specific index name")]
     [string]$IndexName
+,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function OptimizeIndex

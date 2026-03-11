@@ -29,9 +29,12 @@ function Reset-ExtensionInstallationRegKeys
         
         [Parameter(Mandatory=$False)]
         [string] $AdditionalParam
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     $regKey = "\Service\ALMSearch\Settings\IsExtensionOperationInProgress\$EntityType\Uninstalled"
-    Set-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -RegistryPath $regKey -Value $null
+    Set-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -RegistryPath $regKey -Value $null -TrustServerCertificate:$TrustServerCertificate
     Write-Log "Removed registry [$regKey] from [$CollectionDatabaseName] database."
 }

@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The SQL Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
@@ -8,6 +8,9 @@ Param(
 	     
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Enter the number of days since when the tbl_JobHistory data needs to be fetched")]
     [string]$Days
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function ConfigurationDBSearchStatus
@@ -22,7 +25,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $ServiceHostLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\ServiceHostData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{
@@ -38,7 +41,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $SearchConnectionUrlRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\SearchConnectionUrlData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{
@@ -54,7 +57,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $JobThrottlingRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobThrottlingData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{
@@ -70,7 +73,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $SearchRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\SearchRegistryData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{
@@ -86,7 +89,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $JobQueueLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobQueueData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{
@@ -104,7 +107,7 @@ function ConfigurationDBSearchStatus
 	$jobHistoryQueryParams = "DaysAgo='$Days'"
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobHistoryData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $jobHistoryQueryParams
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $jobHistoryQueryParams -TrustServerCertificate:$TrustServerCertificate
 	
 	foreach($row in $queryResults)
 	{

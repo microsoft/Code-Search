@@ -26,7 +26,10 @@ function Test-ElasticsearchHealth
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     # Verify connection parameters are correct
@@ -48,7 +51,7 @@ function Test-ElasticsearchHealth
     }
 
     # Verify number of documents for given collection and entity type is greater than zero
-    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     
     $body = @"
     {
@@ -118,7 +121,8 @@ function Test-ElasticsearchHealth
             -ConfigurationDatabaseName $ConfigurationDatabaseName `
             -CollectionDatabaseName $CollectionDatabaseName `
             -CollectionName $CollectionName `
-            -EntityType $EntityType))
+            -EntityType $EntityType `
+            -TrustServerCertificate:$TrustServerCertificate))
         {
             Write-Log "[MANUAL ACTION MAY BE REQUIRED] No document for entity type [$EntityType] and collection [$CollectionName] is indexed in Elasticsearch. If this is not expected, consider executing Restart-Indexing action." -Level Attention
         }

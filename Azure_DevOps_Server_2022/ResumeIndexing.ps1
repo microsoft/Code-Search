@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
@@ -8,26 +8,29 @@ Param(
     
     [Parameter(Mandatory=$False, Position=2, HelpMessage="Resume Indexing for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function ResumeCodeIndexing
 {
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeCodeIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
     Write-Host "Code Indexing has been resumed!!" -ForegroundColor Green
 }
 
 function ResumeWorkItemIndexing
 {
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWorkItemIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
     Write-Host "WorkItem Indexing has been resumed!!" -ForegroundColor Green
 }
 
 function ResumeWikiIndexing
 {
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWikiIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
     Write-Host "Wiki Indexing has been resumed!!" -ForegroundColor Green
 }
 

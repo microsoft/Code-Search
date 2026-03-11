@@ -1,4 +1,4 @@
-﻿<#
+<#
 This script sets the indexing state of the given repository to On or Off.
 #>
 
@@ -24,6 +24,9 @@ Param(
 
     [Parameter(Mandatory=$True, Position=6, HelpMessage="Set the Indexing State here.")]
     [string]$IndexingState
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 if ([string]::IsNullOrWhiteSpace($SQLServerInstance) -Or [string]::IsNullOrWhiteSpace($CollectionDatabaseName) -Or [string]::IsNullOrWhiteSpace($ConfigurationDatabaseName) -Or [string]::IsNullOrWhiteSpace($CollectionName) -Or [string]::IsNullOrWhiteSpace($ProjectName) -Or [string]::IsNullOrWhiteSpace($RepositoryName)) {
@@ -41,13 +44,13 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
 {
     $IndexingStateParams = "CollectionId='$CollectionID'","ProjectName='$ProjectName'","RepositoryName='$RepositoryName'","IndexingState='$IndexingState'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddRepositoryUpdateMetadataChangeEvent.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $IndexingStateParams
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $IndexingStateParams -TrustServerCertificate:$TrustServerCertificate
 
     <#
         Let's queue the maintenance job now so that the event added above is processed immediately. Otherwise, it would wait for the next check-in/periodic job run to get processed.
@@ -55,7 +58,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
 
     $QueueMaintenanceJobParams = "CollectionId='$CollectionID'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueuePeriodicMaintenanceJob.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $QueueMaintenanceJobParams
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $QueueMaintenanceJobParams -TrustServerCertificate:$TrustServerCertificate
 
     Write-Host "Marked state of Repository '$RepositoryName' in Collection '$CollectionName' to '$IndexingState'" -ForegroundColor Cyan
 }

@@ -17,20 +17,23 @@ Param(
     
     [Parameter(Mandatory=$False, Position=5, HelpMessage="Trigger collection indexing for Code, WorkItem, Wiki or All")]
     [string]$EntityType = "All"
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function CodeIndexingActivity
 {
     Write-Host "Code Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
     {
         $Params = "CollectionId='$CollectionID'" 
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
         # Gets the count of code repositories for which fresh indexing has completed.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeBulkIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingCompletedCount
 
         if($bulkIndexingCompletedRepositoryCount -gt 0)
@@ -44,7 +47,7 @@ function CodeIndexingActivity
 
         # Gets the count of repositories for which fresh indexing is InProgress.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeBulkIndexingInProgressActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingInProgressCount
 
         if($bulkIndexingInProgressRepositoryCount -gt 0)
@@ -59,7 +62,7 @@ function CodeIndexingActivity
 
          # Gets the count of repositories for which continuous indexing has completed.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeContinuousIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $continuousIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingCompletedCount
 
         if($continuousIndexingCompletedRepositoryCount -gt 0)
@@ -73,7 +76,7 @@ function CodeIndexingActivity
 
         # Gets the count of repositories for which continuous indexing is InProgress.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeContinuousIndexingInProgressActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
         $continuousIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingInProgressCount
 
         if($continuousIndexingInProgressRepositoryCount -gt 0)
@@ -87,7 +90,7 @@ function CodeIndexingActivity
 
         # Gets the count of Failed Indexing jobs.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeFailedIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $failedIndexingJobsCount = $queryResults  | Select-object  -ExpandProperty  FailedIndexingCount
 
         if($failedIndexingJobsCount -gt 0)
@@ -109,14 +112,14 @@ function WorkItemIndexingActivity
 {
     Write-Host "WorkItem Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem")
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
     {
         $Params = "CollectionId='$CollectionID'" 
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
         # Gets the count of code repositories for which fresh indexing has completed.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemBulkIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingCompletedCount
 
         if($bulkIndexingCompletedRepositoryCount -gt 0)
@@ -130,7 +133,7 @@ function WorkItemIndexingActivity
 
         # Gets the count of repositories for which fresh indexing is InProgress.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemBulkIndexingInProgressActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  BulkIndexingInProgressCount
 
         if($bulkIndexingInProgressRepositoryCount -gt 0)
@@ -145,7 +148,7 @@ function WorkItemIndexingActivity
 
          # Gets the count of repositories for which continuous indexing has completed.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemContinuousIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $continuousIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingCompletedCount
 
         if($continuousIndexingCompletedRepositoryCount -gt 0)
@@ -159,7 +162,7 @@ function WorkItemIndexingActivity
 
         # Gets the count of repositories for which continuous indexing is InProgress.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemContinuousIndexingInProgressActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
         $continuousIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ContinuousIndexingInProgressCount
 
         if($continuousIndexingInProgressRepositoryCount -gt 0)
@@ -173,7 +176,7 @@ function WorkItemIndexingActivity
 
         # Gets the count of Failed Indexing jobs.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemFailedIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $failedIndexingJobsCount = $queryResults  | Select-object  -ExpandProperty  FailedIndexingCount
 
         if($failedIndexingJobsCount -gt 0)
@@ -195,13 +198,13 @@ function WikiIndexingActivity
 {
     Write-Host "Wiki Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki")
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
     {
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
         # Gets the count of wiki repositories for which fresh indexing has completed.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiIndexingCompletedActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
         if($bulkIndexingCompletedRepositoryCount -gt 0)
@@ -215,7 +218,7 @@ function WikiIndexingActivity
 
         # Gets the count of repositories for which fresh indexing is InProgress.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiIndexingInProgressActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $bulkIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingInProgressCount
 
         if($bulkIndexingInProgressRepositoryCount -gt 0)
@@ -229,7 +232,7 @@ function WikiIndexingActivity
 
         # Gets the count of Failed Indexing operations.
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiFailedIndexingActivity.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
         $failedIndexingOperationsCount = $queryResults  | Select-object  -ExpandProperty  FailedIndexingCount
 
         if($failedIndexingOperationsCount -gt 0)
@@ -254,7 +257,7 @@ Write-Host "Checking indexing state for last $Days days" -ForegroundColor Green
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 switch ($EntityType)
 {
     "All" 
