@@ -1,4 +1,4 @@
-﻿<#
+<#
 This scripts cleans the shard details table from the configuration database
 #>
 
@@ -8,13 +8,17 @@ Param(
     [string]$SQLServerInstance,
 
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Configuration DB")]
-    [string]$ConfigurationDatabaseName
+    [string]$ConfigurationDatabaseName,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function CleanupShardDetails
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CleanUpShardDetailsTable.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose @trustCertParam
     Write-Host "Cleaned up the shard details..." -ForegroundColor Yellow
 }
 

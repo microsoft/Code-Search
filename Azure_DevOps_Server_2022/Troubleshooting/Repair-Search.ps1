@@ -38,6 +38,9 @@
     .PARAMETER EntityType
     Entity type of the impacted collection.
 
+    .PARAMETER TrustServerCertificate
+    If specified, the server certificate is trusted when connecting to SQL Server. Use this when SQL Server uses a self-signed certificate.
+
     .INPUTS
     None. You cannot pipe objects to Repair-Search.
 
@@ -93,7 +96,10 @@ Param
 
     [Parameter(Mandatory=$True)]
     [ValidateSet("Code", "WorkItem", "Wiki")]
-    [string] $EntityType
+    [string] $EntityType,
+
+    [Parameter(Mandatory=$False)]
+    [switch] $TrustServerCertificate
 )
 
 $ErrorActionPreference = "Stop" # We do not want to continue executing the script if we encounter a failure
@@ -142,6 +148,7 @@ try
             -ElasticsearchServiceUrl $ElasticsearchServiceUrl `
             -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
             -EntityType $EntityType `
+            -TrustServerCertificate:$TrustServerCertificate `
             -Verbose:$VerbosePreference `
             -WhatIf:$WhatIfPreference `
             -Confirm:$confirmationRequired `
@@ -215,6 +222,7 @@ try
                 -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
                 -EntityType $EntityType `
                 -AdditionalParam $additionalParam `
+                -TrustServerCertificate:$TrustServerCertificate `
                 -Verbose:$VerbosePreference `
                 -WhatIf:$WhatIfPreference `
                 -Confirm:$confirmationRequired `

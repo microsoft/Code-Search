@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The SQL Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
@@ -10,11 +10,15 @@ Param(
     [string]$ConfigurationDatabaseName,
    
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Collection Name")]
-    [string]$CollectionName
+    [string]$CollectionName,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 function CollectionDBSearchStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	Write-Host "CollectionId = $CollectionID" -ForegroundColor Green
 	
 	$collectionLogDir = Join-Path $PWD -ChildPath "CollectionDBDiagnosticScripts\$CollectionName"
@@ -28,7 +32,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $IndexingUnitLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\IndexingUnitData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -44,7 +48,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $IndexingUnitChangeEventLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\IndexingUnitChangeEventData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -60,7 +64,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $ItemLevelFailuresLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\ItemLevelFailuresData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -76,7 +80,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $JobYieldLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\JobYieldData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -92,7 +96,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $ResourceLockLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\ResourceLockData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -108,7 +112,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $DisabledFilesLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\DisabledFilesData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -124,7 +128,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $SearchRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\SearchRegistryDataOfCollection.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -140,7 +144,7 @@ function CollectionDBSearchStatus
 	Set-Content -Path $ClassificationNodeLogPath ([Environment]::NewLine)
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'CollectionDBDiagnosticScripts\ClassificationNodeData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -163,7 +167,7 @@ Write-Host "Extracting Search diagnostics data from '$CollectionDatabaseName' da
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 
 CollectionDBSearchStatus
 

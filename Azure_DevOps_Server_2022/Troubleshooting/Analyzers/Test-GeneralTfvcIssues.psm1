@@ -27,7 +27,11 @@ function Test-GeneralTfvcIssues
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
         [string] $EntityType
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     
     if ($EntityType -ne "Code")
     {
@@ -36,7 +40,7 @@ function Test-GeneralTfvcIssues
     }
     
     # Get all job Ids corresponding to TFVC repository indexing units
-    $tfvcRepoCount = [int](Invoke-Sqlcmd -Query "SELECT COUNT(1) AS TfvcRepoCount FROM Search.tbl_IndexingUnit WHERE EntityType = 'Code' AND IndexingUnitType = 'TFVC_Repository' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty TfvcRepoCount)
+ $tfvcRepoCount = [int](Invoke-Sqlcmd -Query "SELECT COUNT(1) AS TfvcRepoCount FROM Search.tbl_IndexingUnit WHERE EntityType = 'Code' AND IndexingUnitType = 'TFVC_Repository' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty TfvcRepoCount)
     if ($tfvcRepoCount -eq 0)
     {
         Write-Log "This analyzer is only valid for TFVC repositories. No TFVC repository was found in collection [$CollectionName]."

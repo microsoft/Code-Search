@@ -1,4 +1,4 @@
-﻿#Display collection indexing status for a given collection.
+#Display collection indexing status for a given collection.
 
 [CmdletBinding()]
 Param(
@@ -25,26 +25,30 @@ Param(
 
     [Parameter(Mandatory=$False, Position=5, HelpMessage="URI for Elasticsearch instance.")]
     [String]
-    $Uri
+    $Uri,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
 
 
 function getCollectionIndexingStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     if(!$ConfigurationDatabaseName -or !$CollectionDatabaseName)
     {
         Write-Host "Please enter ConfigurationDatabaseName and CollectionDatabaseName"
         return
     }
     Import-Module .\Common.psm1 -Force
-    $collectionId = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $userCollection
+    $collectionId = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $userCollection -TrustServerCertificate:$TrustServerCertificate
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingCompletedCount.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName @trustCertParam
     $completed =  $queryResults.BulkIndexingCompletedCount
     Write-Host "No of repositories completed: $completed"
                                               
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingInProgressRepositories.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName @trustCertParam
     $inProgress = $queryResults.Length
     Write-Host "Repositories InProgress: $inProgress"
     if($inProgress -gt 0)

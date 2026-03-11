@@ -10,8 +10,12 @@ Param(
     [string]$ConfigurationDatabaseName,
    
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
-    [string]$CollectionName
+    [string]$CollectionName,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 Import-Module .\Common.psm1 -Force
 
@@ -19,12 +23,12 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 
 # Fix the index name in all repo indexing units
 $fixIndexingIndexNameParams = "CollectionId='$CollectionID'"
 $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\FixIndexingIndexName.sql'
-Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $fixIndexingIndexNameParams
+Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $fixIndexingIndexNameParams @trustCertParam
 Write-Host "Fixed the indexing index name in all repo indexing units" -ForegroundColor Cyan
 
 Pop-Location
