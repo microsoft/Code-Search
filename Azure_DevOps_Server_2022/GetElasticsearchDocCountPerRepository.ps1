@@ -11,8 +11,7 @@ Param(
 
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Destination where the output file will be saved.")]
     [String]
-    $Destination
-,
+    $Destination,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate

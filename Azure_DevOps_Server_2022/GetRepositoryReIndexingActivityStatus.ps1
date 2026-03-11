@@ -21,8 +21,7 @@ Param(
 
     [Parameter(Mandatory=$True, Position=4, HelpMessage="URI for Elasticsearch instance.")]
     [String]
-    $Uri
-,
+    $Uri,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate

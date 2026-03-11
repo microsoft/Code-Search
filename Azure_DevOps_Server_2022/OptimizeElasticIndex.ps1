@@ -4,8 +4,7 @@ Param(
     [string]$ElasticServerUrl,
 
     [Parameter(Mandatory=$True, HelpMessage="Enter index name. Eg: code* for all code indices or a specific index name")]
-    [string]$IndexName
-,
+    [string]$IndexName,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
