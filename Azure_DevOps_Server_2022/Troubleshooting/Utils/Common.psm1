@@ -185,7 +185,7 @@ function Confirm-SqlIsReachable
         [string] $CollectionDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
+        [string] $CollectionName,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -377,7 +377,7 @@ function Test-ExtensionInstalled
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -472,7 +472,7 @@ function Test-IndexingFeatureFlagsAreEnabled
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -555,7 +555,7 @@ function Disable-IndexingFeatureFlags
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -614,7 +614,7 @@ function Invoke-FaultInJob
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -643,7 +643,7 @@ function Get-ServiceRegistryValue
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [string] $RegistryPath
+        [string] $RegistryPath,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -686,7 +686,7 @@ function Set-ServiceRegistryValue
         [string] $RegistryPath,
 
         [Parameter(Mandatory=$False)]
-        [string] $Value
+        [string] $Value,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -740,7 +740,7 @@ function Get-FeatureFlag
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [string] $FeatureName
+        [string] $FeatureName,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -789,7 +789,7 @@ function Set-FeatureFlag
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("On", "Off", "Undefined")]
-        [string] $State
+        [string] $State,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -834,7 +834,7 @@ function Queue-ServiceJob
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [guid] $JobId
+        [guid] $JobId,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -875,7 +875,7 @@ function Test-BulkIndexingIsInProgress
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -984,7 +984,7 @@ function Get-SupportedDocumentContractType
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
