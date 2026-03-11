@@ -33,6 +33,7 @@ function Restart-Indexing
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     # Reset uninstall in progress related registry keys
     Reset-ExtensionInstallationRegKeys `
@@ -75,7 +76,7 @@ function Restart-Indexing
     $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     $sqlParams = "CollectionId='$collectionId'", "EntityTypeString='$EntityType'", "EntityTypeInt=$(Get-EntityTypeId $EntityType)"
     $sqlFilePath = "$PSScriptRoot\..\SqlScripts\CleanUpCollectionIndexingState.sql"
-    $response = Invoke-Sqlcmd -InputFile $sqlFilePath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlParams -TrustServerCertificate:$TrustServerCertificate
+    $response = Invoke-Sqlcmd -InputFile $sqlFilePath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlParams @trustCertParam
     Write-Log "Cleaned up all SQL tables storing indexing state."
 
     # Delete data indexed in Elasticsearch
@@ -99,7 +100,7 @@ function Restart-Indexing
     }
 
     # Get all Job Ids corresponding to all indexing units of the given entity type
- $indexingJobIds = Invoke-Sqlcmd -Query "SELECT AssociatedJobId FROM Search.tbl_IndexingUnit WHERE EntityType = '$EntityType' AND AssociatedJobId IS NOT NULL AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate | Select-Object -ExpandProperty AssociatedJobId
+ $indexingJobIds = Invoke-Sqlcmd -Query "SELECT AssociatedJobId FROM Search.tbl_IndexingUnit WHERE EntityType = '$EntityType' AND AssociatedJobId IS NOT NULL AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty AssociatedJobId
     if ($indexingJobIds)
     {
         $timeoutInMinutes = 15
@@ -107,7 +108,7 @@ function Restart-Indexing
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         while ($stopwatch.Elapsed.TotalMinutes -lt $timeoutInMinutes) # Waiting for a maximum of $timeoutInMinutes minutes
         {
- $indexingJobQueuedCount = [int](Invoke-Sqlcmd -Query "SELECT COUNT(1) As IndexingJobQueuedCount FROM dbo.tbl_JobQueue WHERE JobSource = '$collectionId' AND JobId IN ($(($indexingJobIds | ForEach-Object { "'$_'" }) -join ', '))" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate | Select-Object -ExpandProperty IndexingJobQueuedCount)
+ $indexingJobQueuedCount = [int](Invoke-Sqlcmd -Query "SELECT COUNT(1) As IndexingJobQueuedCount FROM dbo.tbl_JobQueue WHERE JobSource = '$collectionId' AND JobId IN ($(($indexingJobIds | ForEach-Object { "'$_'" }) -join ', '))" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty IndexingJobQueuedCount)
             if ($indexingJobQueuedCount -eq 0)
             {
                 Write-Log "All $EntityType indexing jobs have completed."

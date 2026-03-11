@@ -23,11 +23,12 @@ Param(
     [string]$RepositoryName,
 
     [Parameter(Mandatory=$True, Position=6, HelpMessage="File/Folder for which re-index status has to be checked.")]
-    [string]$Path
+    [string]$Path,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 IF ([string]::IsNullOrWhiteSpace($SQLServerInstance) -Or 
     [string]::IsNullOrWhiteSpace($CollectionDatabaseName) -Or 
@@ -67,7 +68,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
 {
     $GetReIndexingStatusParams = "CollectionId='$CollectionID'","ProjectName='$ProjectName'","RepositoryName='$RepositoryName'","Path='$Path'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\GetReIndexingStatusOfFiles.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $GetReIndexingStatusParams -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $GetReIndexingStatusParams @trustCertParam
     
     if ($queryResults)
     {

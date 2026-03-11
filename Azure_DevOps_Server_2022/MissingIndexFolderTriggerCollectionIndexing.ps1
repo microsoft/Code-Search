@@ -10,18 +10,20 @@ Param(
     [string]$ConfigurationDatabaseName,
    
     [Parameter(Mandatory=$True, Position=3, HelpMessage="Enter the Collection Name here.")]
-    [string]$CollectionName
+    [string]$CollectionName,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 Import-Module .\Common.psm1 -Force
 
 function CleanUpIndexingState
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CleanUpCollectionIndexingState_IndexDelete.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName @trustCertParam
     Write-Host "Cleaned up the Collection Indexing state..." -ForegroundColor Yellow    
 }
 
@@ -39,7 +41,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
     $Params = "CollectionId='$CollectionID'"
 
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueCodeExtensionInstallIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
     Write-Host "Successfully queued the Code Indexing job for the collection!!" -ForegroundColor Green
 }
 else
@@ -53,7 +55,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
     $Params = "CollectionId='$CollectionID'"
 
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueWorkItemExtensionInstallIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
     Write-Host "Successfully queued the WorkItem Indexing job for the collection!!" -ForegroundColor Green
 }
 else
@@ -67,7 +69,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
     $Params = "CollectionId='$CollectionID'"
 
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueWikiExtensionInstallIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
     Write-Host "Successfully queued the Wiki Indexing job for the collection!!" -ForegroundColor Green
 }
 else

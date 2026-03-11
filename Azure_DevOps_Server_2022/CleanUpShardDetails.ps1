@@ -8,7 +8,7 @@ Param(
     [string]$SQLServerInstance,
 
     [Parameter(Mandatory=$True, Position=1, HelpMessage="Configuration DB")]
-    [string]$ConfigurationDatabaseName
+    [string]$ConfigurationDatabaseName,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -16,8 +16,9 @@ Param(
 
 function CleanupShardDetails
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CleanUpShardDetailsTable.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose @trustCertParam
     Write-Host "Cleaned up the shard details..." -ForegroundColor Yellow
 }
 

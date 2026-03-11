@@ -34,6 +34,7 @@ Param(
 
 function getCollectionIndexingStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     if(!$ConfigurationDatabaseName -or !$CollectionDatabaseName)
     {
         Write-Host "Please enter ConfigurationDatabaseName and CollectionDatabaseName"
@@ -42,12 +43,12 @@ function getCollectionIndexingStatus
     Import-Module .\Common.psm1 -Force
     $collectionId = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $userCollection -TrustServerCertificate:$TrustServerCertificate
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingCompletedCount.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName @trustCertParam
     $completed =  $queryResults.BulkIndexingCompletedCount
     Write-Host "No of repositories completed: $completed"
                                               
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingInProgressRepositories.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName @trustCertParam
     $inProgress = $queryResults.Length
     Write-Host "Repositories InProgress: $inProgress"
     if($inProgress -gt 0)

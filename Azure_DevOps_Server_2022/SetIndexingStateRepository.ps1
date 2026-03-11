@@ -23,11 +23,12 @@ Param(
     [string]$RepositoryName,
 
     [Parameter(Mandatory=$True, Position=6, HelpMessage="Set the Indexing State here.")]
-    [string]$IndexingState
+    [string]$IndexingState,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 if ([string]::IsNullOrWhiteSpace($SQLServerInstance) -Or [string]::IsNullOrWhiteSpace($CollectionDatabaseName) -Or [string]::IsNullOrWhiteSpace($ConfigurationDatabaseName) -Or [string]::IsNullOrWhiteSpace($CollectionName) -Or [string]::IsNullOrWhiteSpace($ProjectName) -Or [string]::IsNullOrWhiteSpace($RepositoryName)) {
     Throw "None of the values supplied can be null or empty. Please retry"
@@ -50,7 +51,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
 {
     $IndexingStateParams = "CollectionId='$CollectionID'","ProjectName='$ProjectName'","RepositoryName='$RepositoryName'","IndexingState='$IndexingState'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddRepositoryUpdateMetadataChangeEvent.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $IndexingStateParams -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $IndexingStateParams @trustCertParam
 
     <#
         Let's queue the maintenance job now so that the event added above is processed immediately. Otherwise, it would wait for the next check-in/periodic job run to get processed.
@@ -58,7 +59,7 @@ if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollection
 
     $QueueMaintenanceJobParams = "CollectionId='$CollectionID'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueuePeriodicMaintenanceJob.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $QueueMaintenanceJobParams -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $QueueMaintenanceJobParams @trustCertParam
 
     Write-Host "Marked state of Repository '$RepositoryName' in Collection '$CollectionName' to '$IndexingState'" -ForegroundColor Cyan
 }

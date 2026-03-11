@@ -31,11 +31,12 @@ function Test-IndexingUnitPointsToDeletedIndex
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     # Get indexing indices from all indexing units
     $sqlQueryProperties = "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\SearchIndexingIndices.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlQueryProperties -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlQueryProperties @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose

@@ -7,7 +7,7 @@ Param(
     [string]$ConfigurationDatabaseName,
     
     [Parameter(Mandatory=$False, Position=2, HelpMessage="Resume Indexing for Code, WorkItem, Wiki or All")]
-    [string]$EntityType = "All"
+    [string]$EntityType = "All",
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -15,22 +15,25 @@ Param(
 
 function ResumeCodeIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeCodeIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
     Write-Host "Code Indexing has been resumed!!" -ForegroundColor Green
 }
 
 function ResumeWorkItemIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWorkItemIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
     Write-Host "WorkItem Indexing has been resumed!!" -ForegroundColor Green
 }
 
 function ResumeWikiIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\ResumeWikiIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
     Write-Host "Wiki Indexing has been resumed!!" -ForegroundColor Green
 }
 

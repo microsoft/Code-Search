@@ -31,6 +31,7 @@ function Test-SqlHealth
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     # Verify connection parameters are correct
     Confirm-SqlIsReachable -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
@@ -93,7 +94,7 @@ function Test-SqlHealth
     }
 
     Write-Log "Verifying that collection IU is present. If not present, verifying bulk indexing is queued..."
-    if (!(Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE IndexingUnitType = 'Collection' AND EntityType = '$EntityType' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -TrustServerCertificate:$TrustServerCertificate))
+    if (!(Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE IndexingUnitType = 'Collection' AND EntityType = '$EntityType' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam))
     {
         if (Test-BulkIndexingIsInProgress `
             -SQLServerInstance $SQLServerInstance `
@@ -117,7 +118,7 @@ function Test-SqlHealth
 
     $collectionPropUrlParams = "CollectionId='$collectionID'", "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\SearchCollectionProperties.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose
@@ -158,7 +159,7 @@ function Test-SqlHealth
 
     $collectionPropUrlParams = "CollectionId='$CollectionID'", "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\SearchCollectionProperties.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams -TrustServerCertificate:$TrustServerCertificate
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose

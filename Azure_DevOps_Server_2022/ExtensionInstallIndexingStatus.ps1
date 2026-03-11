@@ -16,7 +16,7 @@ Param(
     [string]$Days,
     
     [Parameter(Mandatory=$False, Position=5, HelpMessage="Extension install indexing state for Code, WorkItem, Wiki or All")]
-    [string]$EntityType = "All"
+    [string]$EntityType = "All",
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -27,12 +27,13 @@ Import-Module .\Common.psm1 -Force
 # Fetches the Code Extension install indexing status.
 function CodeExtensionInstallIndexingStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has code extension installed.
     if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
     {
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeAccountFaultInResult.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CodeAccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+        $queryResults = Invoke-Sqlcmd -InputFile "$PWD\SqlScripts\CodeAccountFaultInResult.sql" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
     
         if($queryResults)
         {
@@ -50,7 +51,7 @@ function CodeExtensionInstallIndexingStatus
 
             # Gets the count of repositories for which the code indexing has completed.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CountCodeIndexingCompleted.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams @trustCertParam
             $indexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
             if($indexingCompletedRepositoryCount -gt 0)
@@ -64,7 +65,7 @@ function CodeExtensionInstallIndexingStatus
         
             # Gets the data for repositories which are still inprogress.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeBulkIndexingInProgressRepositoryCount.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params @trustCertParam
             $CodeBulkIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ItemArray
 
             if($CodeBulkIndexingInProgressRepositoryCount -gt 0)
@@ -96,12 +97,13 @@ function CodeExtensionInstallIndexingStatus
 
 function WorkItemExtensionInstallIndexingStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has workitem extension installed.
     if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
     {
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemAccountFaultInResult.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
     
         if($queryResults)
         {
@@ -119,7 +121,7 @@ function WorkItemExtensionInstallIndexingStatus
 
             # Gets the count of repositories for which the indexing has completed.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CountWorkItemIndexingCompleted.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $indexingCompletedQueryParams @trustCertParam
             $indexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
             if($indexingCompletedRepositoryCount -gt 0)
@@ -133,7 +135,7 @@ function WorkItemExtensionInstallIndexingStatus
         
             # Gets the data for projects with workitem indexing still inprogress.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemIndexingInProgressRepositoryCount.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params @trustCertParam
             $WorkItemIndexingInProgressRepositoryCount = $queryResults  | Select-object  -ExpandProperty  ItemArray
 
             if($WorkItemIndexingInProgressRepositoryCount -gt 0)
@@ -165,12 +167,13 @@ function WorkItemExtensionInstallIndexingStatus
 # Fetches the Wiki Extension install indexing status.
 function WikiExtensionInstallIndexingStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has wiki search extension installed.
     if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
     {
         #Gets the result of the Wiki Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiAccountFaultInResult.sql'
-        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+        $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName  -Verbose -Variable $Params @trustCertParam
 
         if($queryResults)
         {
@@ -188,7 +191,7 @@ function WikiExtensionInstallIndexingStatus
 
             # Gets the count of repositories for which the wiki indexing has completed.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiIndexingCompletedActivity.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $indexingCompletedQueryParams @trustCertParam
             $indexingCompletedRepositoryCount = $queryResults  | Select-object  -ExpandProperty  IndexingCompletedCount
 
             if($indexingCompletedRepositoryCount -gt 0)
@@ -202,7 +205,7 @@ function WikiExtensionInstallIndexingStatus
 
             # Gets the data for repositories which are still inprogress.
             $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiIndexingInProgressRepositories.sql'
-            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+            $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName  -Verbose -Variable $Params @trustCertParam
             $WikiIndexingInProgressRepositories = $queryResults  | Select-object  -ExpandProperty  ItemArray
 
             if($WikiIndexingInProgressRepositories -gt 0)

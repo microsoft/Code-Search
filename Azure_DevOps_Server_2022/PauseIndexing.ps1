@@ -7,7 +7,7 @@ Param(
     [string]$ConfigurationDatabaseName,
     
     [Parameter(Mandatory=$False, Position=2, HelpMessage="Pause Indexing for Code, WorkItem, Wiki or All.")]
-    [string]$EntityType = "All"
+    [string]$EntityType = "All",
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -31,20 +31,23 @@ function ImportSQLModule
 
 function PauseCodeIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\PauseCodeIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 }
 
 function PauseWorkItemIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\PauseWorkItemIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 }
 
 function PauseWikiIndexing
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\PauseWikiIndexing.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 }
 
 Write-Host "This would pause indexing for all the collections. Do you want to continue - Yes or No? " -NoNewline -ForegroundColor Magenta

@@ -21,11 +21,12 @@ param (
 
     [Parameter(Mandatory = $true, Position = 5, HelpMessage = "Action to perform.")]
     [ValidateSet("Delete", "View")]
-    [string]$Action
+    [string]$Action,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 $indicesFilePath = Join-Path $PSScriptRoot "indices.txt"
 $settingsFilePath = Join-Path $PSScriptRoot "settings.txt"
@@ -73,7 +74,7 @@ foreach ($index in $indices) {
         
         $Params = "IndexName='$indexName'"
         $sqlFullPath = Join-Path $PSScriptRoot 'SqlScripts\GetActiveIncompatibleIndex.sql'
-        $result = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Verbose -Variable $params -TrustServerCertificate:$TrustServerCertificate
+        $result = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Verbose -Variable $params @trustCertParam
 
         Write-Host "Result: $($result.Count)" -ForegroundColor Red
 

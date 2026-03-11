@@ -31,11 +31,12 @@ function Test-FaultInJobInInfiniteRetries
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     
     # Get the latest fault-in job result message
     $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     $faultInJobId = Get-AccountFaultInJobId -EntityType $EntityType
- $faultInJobResultMessage = Invoke-Sqlcmd -Query "SELECT TOP(1) ResultMessage FROM dbo.tbl_JobHistory WHERE JobSource = '$collectionId' AND JobId = '$faultInJobId' AND Result IN (0, 2) ORDER BY StartTime DESC" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate | Select-Object -ExpandProperty ResultMessage
+ $faultInJobResultMessage = Invoke-Sqlcmd -Query "SELECT TOP(1) ResultMessage FROM dbo.tbl_JobHistory WHERE JobSource = '$collectionId' AND JobId = '$faultInJobId' AND Result IN (0, 2) ORDER BY StartTime DESC" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty ResultMessage
 
     # Check if it contains the message indicating it is waiting for extension uninstallation
     if ($faultInJobResultMessage -and $faultInJobResultMessage.Contains("Requeue the Account Fault-In job since Extension Uninstall sequence is still in progress"))

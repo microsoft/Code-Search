@@ -13,7 +13,7 @@ Param(
     [string]$CollectionName,
     
 	[Parameter(Mandatory=$True, Position=4, HelpMessage="Enter operation type 'Add' for adding more folder(s), 'Remove' for removing folder(s) from exclusion list, 'Delete' for deleting all the folders in the list, 'Fetch' for fetching list of folders present in exclusion list.")]
-    [string]$OperationType
+    [string]$OperationType,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -23,18 +23,20 @@ Import-Module .\Common.psm1 -Force
 
 function AddExcludedFolders
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	$foldersList = Read-Host 'Specify comma separated list of folders to Exclude from Indexing'
 	$Params = "CollectionId='$CollectionID'", "FolderPaths='$foldersList'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\AddFoldersInExclusionList.sql'
-	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params @trustCertParam
 	Write-Host "Added Given folders to Indexing Exclusion list" -ForegroundColor Yellow
 }
 
 function FetchExcludedFoldersList
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	$Params = "CollectionId='$CollectionID'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\FetchFoldersInExclusionList.sql'
-	$QueryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+	$QueryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params @trustCertParam
 	
 	$ExcludedFoldersList = $QueryResults | Select-object -ExpandProperty ExcludedFolders	
 	Write-Host "Folders present in Indexing Exclusion list are: '$ExcludedFoldersList'" -ForegroundColor Yellow
@@ -42,18 +44,20 @@ function FetchExcludedFoldersList
 
 function RemoveFoldersFromExclusionList
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	$foldersList = Read-Host 'Specify comma separated list of folders to remove from Indexing Exclusion list'
 	$Params = "CollectionId='$CollectionID'", "FolderPaths='$foldersList'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\RemoveFoldersFromExclusionList.sql'
-	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params @trustCertParam
 	Write-Host "Removed given folders from Indexing Exclusion list" -ForegroundColor Yellow
 }
 
 function DeleteAllExcludedFolders
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	$Params = "CollectionId='$CollectionID'"
 	$SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\TfvcExcludedFolders\DeleteAllFoldersInExclusionList.sql'
-	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params -TrustServerCertificate:$TrustServerCertificate
+	Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $Params @trustCertParam
 	Write-Host "Deleted all folders from Indexing Exclusion list" -ForegroundColor Yellow
 }
 

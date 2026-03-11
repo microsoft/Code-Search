@@ -7,7 +7,7 @@ Param(
     [string]$ConfigurationDatabaseName,
 	     
     [Parameter(Mandatory=$True, Position=2, HelpMessage="Enter the number of days since when the tbl_JobHistory data needs to be fetched")]
-    [string]$Days
+    [string]$Days,
 
     [Parameter(Mandatory=$False)]
     [switch]$TrustServerCertificate
@@ -15,6 +15,7 @@ Param(
 
 function ConfigurationDBSearchStatus
 {
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 	$configLogDir = Join-Path $PWD -ChildPath 'ConfigurationDBDiagonistics'
 	New-Item -ItemType Directory -Force -Path $configLogDir
 	
@@ -25,7 +26,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $ServiceHostLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\ServiceHostData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -41,7 +42,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $SearchConnectionUrlRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\SearchConnectionUrlData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -57,7 +58,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $JobThrottlingRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobThrottlingData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -73,7 +74,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $SearchRegistryLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\SearchRegistryData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -89,7 +90,7 @@ function ConfigurationDBSearchStatus
 	Set-Content -Path $JobQueueLogPath ([Environment]::NewLine)
 	
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobQueueData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
@@ -107,7 +108,7 @@ function ConfigurationDBSearchStatus
 	$jobHistoryQueryParams = "DaysAgo='$Days'"
 
 	$SqlFullPath = Join-Path $PWD -ChildPath 'ConfigurationDBDiagnosticScripts\JobHistoryData.sql'
-	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $jobHistoryQueryParams -TrustServerCertificate:$TrustServerCertificate
+	$queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $jobHistoryQueryParams @trustCertParam
 	
 	foreach($row in $queryResults)
 	{
