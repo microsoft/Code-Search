@@ -61,14 +61,11 @@ function IsExtensionInstalled
     (
         [string] $SQLServerInstance,
         [string] $CollectionDatabaseName,
-        [string] $RegValue
-
+        [string] $RegValue,
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
-
-    return $true
 
     $isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryItems where ChildItem like '%$RegValue%' and PartitionId > 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam
     
