@@ -62,9 +62,9 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
 {
     $AddFilesParams = "CollectionId='$CollectionID'","ProjectName='$ProjectName'","RepositoryName='$RepositoryName'","Path='$Path'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddFilesToBeIndexed.sql'

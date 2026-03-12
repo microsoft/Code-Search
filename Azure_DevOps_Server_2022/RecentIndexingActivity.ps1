@@ -27,7 +27,7 @@ function CodeIndexingActivity
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     Write-Host "Code Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
     {
         $Params = "CollectionId='$CollectionID'" 
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
@@ -114,7 +114,7 @@ function WorkItemIndexingActivity
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     Write-Host "WorkItem Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" @trustCertParam)
     {
         $Params = "CollectionId='$CollectionID'" 
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
@@ -201,7 +201,7 @@ function WikiIndexingActivity
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     Write-Host "Wiki Indexing Stats:" -ForegroundColor Green
 
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" @trustCertParam)
     {
         $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
 
@@ -260,7 +260,8 @@ Write-Host "Checking indexing state for last $Days days" -ForegroundColor Green
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 switch ($EntityType)
 {
     "All" 

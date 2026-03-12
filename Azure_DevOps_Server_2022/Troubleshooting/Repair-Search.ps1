@@ -116,6 +116,8 @@ Set-Variable LogFilePath -Option AllScope -Scope Global -Force -Value $logFilePa
 # which is prone to manual error, we will save its value in a global variable which will be accessible everywhere.
 Set-Variable RepairSearchVerbosePreference -Option ReadOnly -Scope Global -Force -Value $VerbosePreference -Confirm:$false -WhatIf:$false
 
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+
 try
 {
     Write-Log "=== Start Repair-Search ===" -Verbose:$VerbosePreference
@@ -148,7 +150,7 @@ try
             -ElasticsearchServiceUrl $ElasticsearchServiceUrl `
             -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
             -EntityType $EntityType `
-            -TrustServerCertificate:$TrustServerCertificate `
+            @trustCertParam `
             -Verbose:$VerbosePreference `
             -WhatIf:$WhatIfPreference `
             -Confirm:$confirmationRequired `
@@ -222,7 +224,7 @@ try
                 -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
                 -EntityType $EntityType `
                 -AdditionalParam $additionalParam `
-                -TrustServerCertificate:$TrustServerCertificate `
+                @trustCertParam `
                 -Verbose:$VerbosePreference `
                 -WhatIf:$WhatIfPreference `
                 -Confirm:$confirmationRequired `

@@ -23,7 +23,7 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 # Fix the index name in all repo indexing units
 $fixIndexingIndexNameParams = "CollectionId='$CollectionID'"

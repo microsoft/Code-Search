@@ -41,7 +41,7 @@ function getCollectionIndexingStatus
         return
     }
     Import-Module .\Common.psm1 -Force
-    $collectionId = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $userCollection -TrustServerCertificate:$TrustServerCertificate
+    $collectionId = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $userCollection @trustCertParam
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeIndexingCompletedCount.sql'
     $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -ServerInstance $SQLServerInstance -Database $collectionDatabaseName @trustCertParam
     $completed =  $queryResults.BulkIndexingCompletedCount
