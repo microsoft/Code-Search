@@ -70,7 +70,7 @@ function Restart-Indexing
         -CollectionDatabaseName $CollectionDatabaseName `
         -CollectionName $CollectionName `
         -EntityType $EntityType `
-            -TrustServerCertificate:$TrustServerCertificate
+        -TrustServerCertificate:$TrustServerCertificate
 
     # Reset data from SQL
     $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
@@ -137,7 +137,7 @@ function Restart-Indexing
         -WhatIf:$False `
         -Confirm:$False `
         -Verbose:$VerbosePreference `
-            -TrustServerCertificate:$TrustServerCertificate
+        -TrustServerCertificate:$TrustServerCertificate
 
     # Queue fault-in job if not queued already
     if (!(Test-BulkIndexingIsInProgress `
@@ -154,7 +154,7 @@ function Restart-Indexing
             -CollectionDatabaseName $CollectionDatabaseName `
             -CollectionName $CollectionName `
             -EntityType $EntityType `
-                -TrustServerCertificate:$TrustServerCertificate
+            -TrustServerCertificate:$TrustServerCertificate
     }
     else
     {
