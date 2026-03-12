@@ -26,7 +26,7 @@ function Test-GeneralTfvcIssues
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate

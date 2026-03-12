@@ -28,7 +28,7 @@ function Remove-OrphanIndexedDocuments
         [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
-        [string] $AdditionalParam
+        [string] $AdditionalParam,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate

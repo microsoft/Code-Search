@@ -77,7 +77,7 @@ function Get-CollectionId
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
+        [string] $CollectionName,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -114,7 +114,7 @@ function Confirm-CollectionIsInStartedState
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
+        [string] $CollectionName,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -149,7 +149,7 @@ function Get-DeploymentHostId
         [string] $SQLServerInstance,
 
         [Parameter(Mandatory=$True)]
-        [string] $ConfigurationDatabaseName
+        [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
@@ -378,7 +378,7 @@ function Test-ExtensionInstalled
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
         [string] $EntityType,
-
+        
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )

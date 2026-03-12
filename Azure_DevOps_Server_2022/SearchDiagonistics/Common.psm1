@@ -34,8 +34,7 @@ function ValidateCollectionName
     (
         [string] $SQLServerInstance,
         [string] $ConfigurationDatabaseName,
-        [string] $CollectionName
-
+        [string] $CollectionName,
         [Parameter(Mandatory=$False)]
         [switch] $TrustServerCertificate
     )
