@@ -26,7 +26,7 @@ Import-Module "$PSScriptRoot\Common.psm1" -Force
 function TriggerCodeIndexing
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
     {
         $Params = "CollectionId='$CollectionID'", "EntityTypeString='Code'", "EntityTypeInt=1"
         $SqlFullPath = Join-Path $PSScriptRoot -ChildPath 'SqlScripts\CleanUpCollectionIndexingState.sql'
@@ -46,7 +46,7 @@ function TriggerCodeIndexing
 function TriggerWorkItemIndexing
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" @trustCertParam)
     {
         $Params = "CollectionId='$CollectionID'", "EntityTypeString='WorkItem'", "EntityTypeInt=4"
         $SqlFullPath = Join-Path $PSScriptRoot -ChildPath 'SqlScripts\CleanUpCollectionIndexingState.sql'
@@ -66,7 +66,7 @@ function TriggerWorkItemIndexing
 function TriggerWikiIndexing
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" @trustCertParam)
     {
         $Params = "CollectionId='$CollectionID'", "EntityTypeString='Wiki'", "EntityTypeInt=6"
         $SqlFullPath = Join-Path $PSScriptRoot -ChildPath 'SqlScripts\CleanUpCollectionIndexingState.sql'
@@ -85,7 +85,8 @@ function TriggerWikiIndexing
 
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 switch ($EntityType)
 {

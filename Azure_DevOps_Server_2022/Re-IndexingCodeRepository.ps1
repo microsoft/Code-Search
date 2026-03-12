@@ -29,9 +29,9 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
 {
     $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddCodeRe-IndexingJobData.sql'

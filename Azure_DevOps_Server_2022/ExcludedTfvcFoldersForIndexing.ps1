@@ -65,7 +65,8 @@ function DeleteAllExcludedFolders
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 switch ($OperationType)
 {

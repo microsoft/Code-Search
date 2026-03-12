@@ -167,7 +167,8 @@ Write-Host "Extracting Search diagnostics data from '$CollectionDatabaseName' da
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 CollectionDBSearchStatus
 

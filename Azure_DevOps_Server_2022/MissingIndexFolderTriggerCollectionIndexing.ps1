@@ -31,12 +31,12 @@ function CleanUpIndexingState
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 CleanUpIndexingState
 
 # Queue Collection code indexing job.
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
 {
     $Params = "CollectionId='$CollectionID'"
 
@@ -50,7 +50,7 @@ else
 }
 
 # Queue Collection workitem indexing job.
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" @trustCertParam)
 {
     $Params = "CollectionId='$CollectionID'"
 
@@ -64,7 +64,7 @@ else
 }
 
 # Queue Collection wiki indexing job.
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" @trustCertParam)
 {
     $Params = "CollectionId='$CollectionID'"
 

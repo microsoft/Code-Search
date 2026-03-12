@@ -24,12 +24,14 @@ Param(
 
 Import-Module .\Common.psm1 -Force
 
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+
 # Fetches the Code Extension install indexing status.
 function CodeExtensionInstallIndexingStatus
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has code extension installed.
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
     {
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\CodeAccountFaultInResult.sql'
@@ -99,7 +101,7 @@ function WorkItemExtensionInstallIndexingStatus
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has workitem extension installed.
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWorkItem" @trustCertParam)
     {
         #Gets the result of the Code Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WorkItemAccountFaultInResult.sql'
@@ -169,7 +171,7 @@ function WikiExtensionInstallIndexingStatus
 {
     $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     # Validating if the collection has wiki search extension installed.
-    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate)
+    if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexedForWiki" @trustCertParam)
     {
         #Gets the result of the Wiki Extension AccountFaultIn job
         $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\WikiAccountFaultInResult.sql'
@@ -241,7 +243,7 @@ Push-Location
 ImportSQLModule
 
 # Checking for valid Collection Name.
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName -TrustServerCertificate:$TrustServerCertificate
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
 $Params = "CollectionId='$CollectionID'" 
 $indexingCompletedQueryParams = "DaysAgo='$Days'","CollectionId='$CollectionID'"
