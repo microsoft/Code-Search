@@ -104,7 +104,7 @@ function Test-SqlHealth
             -EntityType $EntityType `
             -TrustServerCertificate:$TrustServerCertificate)
         {
-            Write-Log "$EntityType collection indexing unit does not exist and bulk-indexing is in progress. Skipping rest of the validations in this analyzer because they require the collection indexing unit to te present."
+            Write-Log "$EntityType collection indexing unit does not exist and bulk-indexing is in progress. Skipping rest of the validations in this analyzer because they require the collection indexing unit to be present."
             return @()
         }
     }
