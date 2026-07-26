@@ -1,0 +1,5 @@
+SELECT [TFSEntityId]
+      ,[EntityType]
+      ,[BatchId]
+      ,[Content]
+FROM [Search].[tbl_JobYield]
