@@ -1,4 +1,4 @@
-﻿#Display respository indexing status for a given collection.
+#Display repository indexing status for a given collection.
 
 [CmdletBinding()]
 Param(

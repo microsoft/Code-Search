@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 Param(
     [Parameter(Mandatory=$True, Position=0, HelpMessage="The Server Instance against which the script is to run.")]
     [string]$SQLServerInstance,
@@ -16,8 +16,12 @@ Param(
     [string]$CollectionName,
     
     [Parameter(Mandatory=$True, Position=5, HelpMessage="Update the tfvc/git repository name here.")]
-    [string]$RepositoryName
+    [string]$RepositoryName,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 Import-Module .\Common.psm1 -Force
 
@@ -25,18 +29,18 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
 {
     $addDataParams = "IndexingUnitType='$IndexingUnitType'","CollectionId='$CollectionID'","RepositoryName='$RepositoryName'","RepositoryType='$IndexingUnitType'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\AddCodeRe-IndexingJobData.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $addDataParams @trustCertParam
     Write-Host "Added the job data as '$addDataParams'" -ForegroundColor Cyan
 
     $queueJobParams = "CollectionID='$CollectionID'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\QueueCodeRe-IndexingJob.sql'
-    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams
+    Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Variable $queueJobParams @trustCertParam
     Write-Host "Successfully queued re-indexing job for the repository." -ForegroundColor Green
 }
 else

@@ -34,10 +34,13 @@ function ValidateCollectionName
     (
         [string] $SQLServerInstance,
         [string] $ConfigurationDatabaseName,
-        [string] $CollectionName
+        [string] $CollectionName,
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
-    $queryResults = Invoke-Sqlcmd -Query "Select HostID from [dbo].[tbl_ServiceHost] where Name = '$CollectionName' and HostType = 4" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Verbose
+    $queryResults = Invoke-Sqlcmd -Query "Select HostID from [dbo].[tbl_ServiceHost] where Name = '$CollectionName' and HostType = 4" -serverInstance $SQLServerInstance -database $ConfigurationDatabaseName -Verbose @trustCertParam
 
     $CollectionID = $queryResults  | Select-object  -ExpandProperty  HOSTID
 
@@ -57,12 +60,13 @@ function IsExtensionInstalled
     (
         [string] $SQLServerInstance,
         [string] $CollectionDatabaseName,
-        [string] $RegValue
+        [string] $RegValue,
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
-    return $true
-
-    $isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryItems where ChildItem like '%$RegValue%' and PartitionId > 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName
+    $isCollectionIndexed = Invoke-Sqlcmd -Query "Select RegValue from tbl_RegistryItems where ChildItem like '%$RegValue%' and PartitionId > 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam
 
     if($isCollectionIndexed.RegValue -eq "True")
     {

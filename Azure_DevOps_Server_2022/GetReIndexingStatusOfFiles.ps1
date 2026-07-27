@@ -1,4 +1,4 @@
-﻿<#
+<#
 This script configures a path of a repository for re-indexing.
 #>
 
@@ -23,8 +23,12 @@ Param(
     [string]$RepositoryName,
 
     [Parameter(Mandatory=$True, Position=6, HelpMessage="File/Folder for which re-index status has to be checked.")]
-    [string]$Path
+    [string]$Path,
+
+    [Parameter(Mandatory=$False)]
+    [switch]$TrustServerCertificate
 )
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 IF ([string]::IsNullOrWhiteSpace($SQLServerInstance) -Or 
     [string]::IsNullOrWhiteSpace($CollectionDatabaseName) -Or 
@@ -58,13 +62,13 @@ Import-Module .\Common.psm1 -Force
 Push-Location
 ImportSQLModule
 
-$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName
+$CollectionID = ValidateCollectionName $SQLServerInstance $ConfigurationDatabaseName $CollectionName @trustCertParam
 
-if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed")
+if(IsExtensionInstalled $SQLServerInstance $CollectionDatabaseName "IsCollectionIndexed" @trustCertParam)
 {
     $GetReIndexingStatusParams = "CollectionId='$CollectionID'","ProjectName='$ProjectName'","RepositoryName='$RepositoryName'","Path='$Path'"
     $SqlFullPath = Join-Path $PWD -ChildPath 'SqlScripts\GetReIndexingStatusOfFiles.sql'
-    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $GetReIndexingStatusParams
+    $queryResults = Invoke-Sqlcmd -InputFile $SqlFullPath -serverInstance $SQLServerInstance -database $CollectionDatabaseName -Variable $GetReIndexingStatusParams @trustCertParam
     
     if ($queryResults)
     {

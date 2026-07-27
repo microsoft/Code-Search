@@ -26,17 +26,21 @@ function Test-SqlHealth
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     # Verify connection parameters are correct
-    Confirm-SqlIsReachable -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName
+    Confirm-SqlIsReachable -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 
     # Verify IsSearchConfigured setting in Configuration DB
     Write-Log "Verifying IsSearchConfigured setting in Configuration DB..."
 
     $configureRegKey = "\Service\ALMSearch\Settings\IsSearchConfigured"
-    $isSearchConfigured = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $configureRegKey
+    $isSearchConfigured = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $configureRegKey -TrustServerCertificate:$TrustServerCertificate
     if (!$isSearchConfigured -or $isSearchConfigured -eq "False")
     {
         Write-Log "Search is not configured." -Level Error
@@ -47,7 +51,7 @@ function Test-SqlHealth
     Write-Log "Verifying Search URL settings in Configuration DB..."
 
     $atRegKey = "\Service\ALMSearch\Settings\ATSearchPlatformConnectionString"
-    $atSearchPlatformConnectionString = [uri](Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $atRegKey)
+    $atSearchPlatformConnectionString = [uri](Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $atRegKey -TrustServerCertificate:$TrustServerCertificate)
     if (!$atSearchPlatformConnectionString)
     {
         Write-Log "AT search platform connection string registry key [$atRegKey] not found." -Level Error
@@ -60,7 +64,7 @@ function Test-SqlHealth
     }
 
     $jaRegKey = "\Service\ALMSearch\Settings\JobAgentSearchPlatformConnectionString"
-    $jaSearchPlatformConnectionString = [uri](Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $jaRegKey)
+    $jaSearchPlatformConnectionString = [uri](Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $jaRegKey -TrustServerCertificate:$TrustServerCertificate)
     if (!$jaSearchPlatformConnectionString)
     {
         Write-Log "JobAgent search platform connection string registry key [$jaRegKey] not found." -Level Error
@@ -75,7 +79,7 @@ function Test-SqlHealth
     # Verify entity specific extension is installed
     Write-Log "Verifying $EntityType search extension is installed..."
 
-    $isExtensionInstalled = Test-ExtensionInstalled -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -EntityType $EntityType
+    $isExtensionInstalled = Test-ExtensionInstalled -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -EntityType $EntityType -TrustServerCertificate:$TrustServerCertificate
     if (!$isExtensionInstalled)
     {
         return "Request-InstallSearchExtension"
@@ -83,23 +87,24 @@ function Test-SqlHealth
 
     # Verify primary indexing FFs in Configuration DB
     Write-Log "Verifying primary indexing feature flags..."
-    $indexingFeatureFlagsEnabled = Test-IndexingFeatureFlagsAreEnabled -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -EntityType $EntityType
+    $indexingFeatureFlagsEnabled = Test-IndexingFeatureFlagsAreEnabled -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -EntityType $EntityType -TrustServerCertificate:$TrustServerCertificate
     if (!$indexingFeatureFlagsEnabled)
     {
         return "Enable-IndexingFeatureFlags"
     }
 
     Write-Log "Verifying that collection IU is present. If not present, verifying bulk indexing is queued..."
-    if (!(Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE IndexingUnitType = 'Collection' AND EntityType = '$EntityType' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName))
+    if (!(Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE IndexingUnitType = 'Collection' AND EntityType = '$EntityType' AND IsDeleted = 0 AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam))
     {
         if (Test-BulkIndexingIsInProgress `
             -SQLServerInstance $SQLServerInstance `
             -ConfigurationDatabaseName $ConfigurationDatabaseName `
             -CollectionDatabaseName $CollectionDatabaseName `
             -CollectionName $CollectionName `
-            -EntityType $EntityType)
+            -EntityType $EntityType `
+            -TrustServerCertificate:$TrustServerCertificate)
         {
-            Write-Log "$EntityType collection indexing unit does not exist and bulk-indexing is in progress. Skipping rest of the validations in this analyzer because they require the collection indexing unit to te present."
+            Write-Log "$EntityType collection indexing unit does not exist and bulk-indexing is in progress. Skipping rest of the validations in this analyzer because they require the collection indexing unit to be present."
             return @()
         }
     }
@@ -109,11 +114,11 @@ function Test-SqlHealth
     #                                        <QueryESConnectionString>{URL}</QueryESConnectionString>
     Write-Log "Verifying Collection IU properties' Index and Query URL match the configuration DB connection URL..."
 
-    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 
     $collectionPropUrlParams = "CollectionId='$collectionID'", "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\SearchCollectionProperties.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose
@@ -139,7 +144,7 @@ function Test-SqlHealth
     }
     
     # Verify document contract type in registry is as expected
-    $supportedDocumentContractType = Get-SupportedDocumentContractType -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -EntityType $EntityType
+    $supportedDocumentContractType = Get-SupportedDocumentContractType -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -EntityType $EntityType -TrustServerCertificate:$TrustServerCertificate
     $expectedDocumentContractType = Get-ExpectedDocumentContractType -EntityType $EntityType
     if ($supportedDocumentContractType -ne $expectedDocumentContractType)
     {
@@ -154,7 +159,7 @@ function Test-SqlHealth
 
     $collectionPropUrlParams = "CollectionId='$CollectionID'", "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\SearchCollectionProperties.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $collectionPropUrlParams @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose

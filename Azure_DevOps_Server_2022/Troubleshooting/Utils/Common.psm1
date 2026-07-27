@@ -39,12 +39,16 @@ function Get-CollectionName
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [guid] $CollectionId
+        [guid] $CollectionId,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     try
     {
-        $results = Invoke-Sqlcmd -Query "Select Name from dbo.tbl_ServiceHost WHERE HostId = '$CollectionId' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -ErrorAction Stop
+        $results = Invoke-Sqlcmd -Query "Select Name from dbo.tbl_ServiceHost WHERE HostId = '$CollectionId' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -ErrorAction Stop @trustCertParam
         if (!$results)
         {
             throw "Either the collection with Id [$CollectionId] does not exist or it is in a detached state."
@@ -73,12 +77,16 @@ function Get-CollectionId
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
+        [string] $CollectionName,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     try
     {
-        $results = Invoke-Sqlcmd -Query "Select HostId from dbo.tbl_ServiceHost WHERE Name = '$CollectionName' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -ErrorAction Stop
+        $results = Invoke-Sqlcmd -Query "Select HostId from dbo.tbl_ServiceHost WHERE Name = '$CollectionName' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -ErrorAction Stop @trustCertParam
         if (!$results)
         {
             throw "Either collection [$CollectionName] does not exist or it is in a detached state."
@@ -106,10 +114,14 @@ function Confirm-CollectionIsInStartedState
         [string] $ConfigurationDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
-    )
+        [string] $CollectionName,
 
-    $results = Invoke-Sqlcmd -Query "Select Status from dbo.tbl_ServiceHost WHERE Name = '$CollectionName' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
+    )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+
+    $results = Invoke-Sqlcmd -Query "Select Status from dbo.tbl_ServiceHost WHERE Name = '$CollectionName' AND HostType = 4" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam
     if (!$results)
     {
         throw [ArgumentException]"Either collection [$CollectionName] does not exist or it is in a detached state."
@@ -137,10 +149,14 @@ function Get-DeploymentHostId
         [string] $SQLServerInstance,
 
         [Parameter(Mandatory=$True)]
-        [string] $ConfigurationDatabaseName
-    )
+        [string] $ConfigurationDatabaseName,
 
-    $deploymentHostId = Invoke-Sqlcmd -Query "Select HostID from dbo.tbl_ServiceHost WHERE Name = 'TEAM FOUNDATION' AND HostType = 3" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty HostId
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
+    )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+
+ $deploymentHostId = Invoke-Sqlcmd -Query "Select HostID from dbo.tbl_ServiceHost WHERE Name = 'TEAM FOUNDATION' AND HostType = 3" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty HostId
     if (!$deploymentHostId)
     {
         throw "Deployment host Id not found."
@@ -169,15 +185,19 @@ function Confirm-SqlIsReachable
         [string] $CollectionDatabaseName,
 
         [Parameter(Mandatory=$True)]
-        [string] $CollectionName
-    )
+        [string] $CollectionName,
 
-    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
+    )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
+
+    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     $partitionId = $null
 
     try
     {
-        $partitionId = Invoke-Sqlcmd -Query "SELECT PartitionId FROM dbo.tbl_DatabasePartitionMap WHERE ServiceHostId = '$collectionId'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -ErrorAction Stop | Select-Object -ExpandProperty PartitionId
+ $partitionId = Invoke-Sqlcmd -Query "SELECT PartitionId FROM dbo.tbl_DatabasePartitionMap WHERE ServiceHostId = '$collectionId'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -ErrorAction Stop @trustCertParam | Select-Object -ExpandProperty PartitionId
     }
     catch
     {
@@ -194,7 +214,7 @@ function Confirm-SqlIsReachable
         throw "Expected partition Id of the collection [$CollectionName] in database [$CollectionDatabaseName] to be 1, but found $partitionId. This could indicate a non-supported deployment."
     }
 
-    Confirm-CollectionIsInStartedState -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+    Confirm-CollectionIsInStartedState -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
 }
 
 function Invoke-ElasticsearchCommand
@@ -357,21 +377,25 @@ function Test-ExtensionInstalled
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+        
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     switch ($EntityType)
     {
         "Code"
         {
-            $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM Extension.tbl_InstalledExtension WHERE PublisherName = 'ms' and ExtensionName = 'vss-code-search'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty ExtensionName
+ $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM Extension.tbl_InstalledExtension WHERE PublisherName = 'ms' and ExtensionName = 'vss-code-search'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty ExtensionName
             if (!$extensionName)
             {
                 Write-Log "$_ search extension is not installed" -Level Warn
                 return $false
             }
 
-            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexed"
+            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexed" -TrustServerCertificate:$TrustServerCertificate
             
             if (!$isExtensionInstalRecorded)
             {
@@ -384,14 +408,14 @@ function Test-ExtensionInstalled
 
         "WorkItem"
         {
-            $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM [Extension].[tbl_InstalledExtension] where PublisherName = 'ms' and ExtensionName = 'vss-workitem-searchonprem'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty ExtensionName
+ $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM [Extension].[tbl_InstalledExtension] where PublisherName = 'ms' and ExtensionName = 'vss-workitem-searchonprem'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty ExtensionName
             if (!$extensionName)
             {
                 Write-Log "$_ search extension is not installed" -Level Warn
                 return $false
             }
             
-            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexedForWorkItem"
+            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexedForWorkItem" -TrustServerCertificate:$TrustServerCertificate
             
             if (!$isExtensionInstalRecorded)
             {
@@ -404,14 +428,14 @@ function Test-ExtensionInstalled
 
         "Wiki"
         {
-            $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM [Extension].[tbl_InstalledExtension] where PublisherName = 'ms' and ExtensionName = 'vss-wiki-searchonprem'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty ExtensionName
+ $extensionName = Invoke-Sqlcmd -Query "SELECT ExtensionName FROM [Extension].[tbl_InstalledExtension] where PublisherName = 'ms' and ExtensionName = 'vss-wiki-searchonprem'" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty ExtensionName
             if (!$extensionName)
             {
                 Write-Log "$_ search extension is not installed" -Level Warn
                 return $false
             }
             
-            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexedForWiki"
+            $isExtensionInstalRecorded = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -RegistryPath "\Service\ALMSearch\Settings\IsCollectionIndexedForWiki" -TrustServerCertificate:$TrustServerCertificate
             
             if (!$isExtensionInstalRecorded)
             {
@@ -448,20 +472,23 @@ function Test-IndexingFeatureFlagsAreEnabled
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     switch ($EntityType)
     {
         "Code"
         {
-            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing"))
+            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.Code.Indexing feature flag is not enabled." -Level Error
                 return $false
             }
             
-            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations"))
+            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.Code.CrudOperations feature flag is not enabled." -Level Error
                 return $false
@@ -472,12 +499,12 @@ function Test-IndexingFeatureFlagsAreEnabled
 
         "WorkItem"
         {
-            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing"))
+            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.WorkItem.Indexing feature flag is not enabled." -Level Error
                 return $false
             }
-            elseif (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations"))
+            elseif (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.WorkItem.CrudOperations feature flag is not enabled." -Level Error
                 return $false
@@ -488,12 +515,12 @@ function Test-IndexingFeatureFlagsAreEnabled
 
         "Wiki"
         {
-            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing"))
+            if (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.Wiki.Indexing feature flag is not enabled." -Level Error
                 return $false
             }
-            elseif (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing"))
+            elseif (!(Get-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -TrustServerCertificate:$TrustServerCertificate))
             {
                 Write-Log "Search.Server.Wiki.ContinuousIndexing feature flag is not enabled." -Level Error
                 return $false
@@ -528,7 +555,10 @@ function Disable-IndexingFeatureFlags
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     Write-Log "Disabling [$EntityType] indexing feature flags for collection [$CollectionName]..."
@@ -536,22 +566,22 @@ function Disable-IndexingFeatureFlags
     {
         "Code"
         {
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing" -State Off
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations" -State Off
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing" -State Off -TrustServerCertificate:$TrustServerCertificate
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations" -State Off -TrustServerCertificate:$TrustServerCertificate
             break
         }
 
         "WorkItem"
         {
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing" -State Off
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations" -State Off
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing" -State Off -TrustServerCertificate:$TrustServerCertificate
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations" -State Off -TrustServerCertificate:$TrustServerCertificate
             break
         }
 
         "Wiki"
         {
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing" -State Off
-            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State Off
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing" -State Off -TrustServerCertificate:$TrustServerCertificate
+            Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State Off -TrustServerCertificate:$TrustServerCertificate
             break
         }
             
@@ -584,10 +614,13 @@ function Invoke-FaultInJob
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
-    Queue-ServiceJob -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -JobId (Get-AccountFaultInJobId -EntityType $EntityType)
+    Queue-ServiceJob -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -JobId (Get-AccountFaultInJobId -EntityType $EntityType) -TrustServerCertificate:$TrustServerCertificate
     Write-Log "Queued [$EntityType] bulk indexing of collection [$CollectionName]."
 }
 
@@ -610,8 +643,12 @@ function Get-ServiceRegistryValue
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [string] $RegistryPath
+        [string] $RegistryPath,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     $parentPath = "#$(Split-Path $RegistryPath -Parent -ErrorAction Stop)\"
     Write-Log "ParentPath = [$parentPath]." -Level Verbose
@@ -620,11 +657,11 @@ function Get-ServiceRegistryValue
 
     if ($CollectionDatabaseName)
     {
-        return Invoke-Sqlcmd -Query "SELECT RegValue FROM dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty RegValue
+ return Invoke-Sqlcmd -Query "SELECT RegValue FROM dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty RegValue
     }
     else
     {
-        return Invoke-Sqlcmd -Query "SELECT RegValue FROM dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty RegValue
+ return Invoke-Sqlcmd -Query "SELECT RegValue FROM dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty RegValue
     }
 }
 
@@ -649,8 +686,12 @@ function Set-ServiceRegistryValue
         [string] $RegistryPath,
 
         [Parameter(Mandatory=$False)]
-        [string] $Value
+        [string] $Value,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     if (!$Value)
     {
@@ -670,13 +711,13 @@ function Set-ServiceRegistryValue
     {
         $command = "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $Value"
         Write-Log "Command = $command" -Level Verbose
-        Invoke-Sqlcmd -Query $command -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName
+        Invoke-Sqlcmd -Query $command -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam
     }
     else
     {
         $command = "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $Value"
         Write-Log "Command = $command" -Level Verbose
-        Invoke-Sqlcmd -Query $command -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName
+        Invoke-Sqlcmd -Query $command -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam
     }
 }
 
@@ -699,17 +740,21 @@ function Get-FeatureFlag
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [string] $FeatureName
+        [string] $FeatureName,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     $parentPath = "#\FeatureAvailability\Entries\$FeatureName\"
     $childItem = "AvailabilityState\"
 
     if ($CollectionDatabaseName)
     {
-        $collectionHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty RegValue
+ $collectionHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty RegValue
         Write-Log "State of feature flag [$FeatureName] in collection DB is [$collectionHostValue]." -Level Verbose
-        $deploymentHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty RegValue
+ $deploymentHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty RegValue
         Write-Log "State of feature flag [$FeatureName] in configuration DB is [$deploymentHostValue]." -Level Verbose
 
         $effectiveValue =  (($deploymentHostValue -eq 1 -and $collectionHostValue -eq $null) -or ($deploymentHostValue -eq $null -and $collectionHostValue -eq 1) -or ($deploymentHostValue -eq 1 -and $collectionHostValue -eq 1))
@@ -717,7 +762,7 @@ function Get-FeatureFlag
     }
     else
     {
-        $deploymentHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty RegValue
+ $deploymentHostValue = Invoke-Sqlcmd -Query "SELECT RegValue from dbo.tbl_RegistryItems WHERE ParentPath = '$parentPath' AND ChildItem = '$childItem' AND PartitionId = 1" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty RegValue
         return $deploymentHostValue -eq 1
     }
 }
@@ -744,8 +789,12 @@ function Set-FeatureFlag
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("On", "Off", "Undefined")]
-        [string] $State
+        [string] $State,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     $parentPath = "#\FeatureAvailability\Entries\$FeatureName\"
     $childItem = "AvailabilityState\"
@@ -762,11 +811,11 @@ function Set-FeatureFlag
 
     if ($CollectionDatabaseName)
     {
-        Invoke-Sqlcmd -Query "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $regValue" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName
+        Invoke-Sqlcmd -Query "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $regValue" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam
     }
     else
     {
-        Invoke-Sqlcmd -Query "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $regValue" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName
+        Invoke-Sqlcmd -Query "EXEC prc_SetRegistryValue @partitionId = 1, @key = '$parentPath$childItem', @value = $regValue" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam
     }
 }
 
@@ -785,21 +834,25 @@ function Queue-ServiceJob
         [string] $CollectionName,
 
         [Parameter(Mandatory=$True)]
-        [guid] $JobId
+        [guid] $JobId,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     if (!$CollectionName) # Deployment host job
     {
-        $hostId = Get-DeploymentHostId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName
+        $hostId = Get-DeploymentHostId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -TrustServerCertificate:$TrustServerCertificate
     }
     else # Collection host job
     {
-        $hostId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+        $hostId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     }
 
     $sqlParams = "HostId='$hostId'", "JobId='$JobId'"
     $sqlFilePath = "$PSScriptRoot\..\SqlScripts\QueueJob.sql"
-    $response = Invoke-Sqlcmd -InputFile $sqlFilePath -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -Variable $sqlParams
+    $response = Invoke-Sqlcmd -InputFile $sqlFilePath -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName -Variable $sqlParams @trustCertParam
 }
 
 function Test-BulkIndexingIsInProgress
@@ -822,41 +875,45 @@ function Test-BulkIndexingIsInProgress
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
     
-    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName
+    $collectionId = Get-CollectionId -SqlServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionName $CollectionName -TrustServerCertificate:$TrustServerCertificate
     
     # If fault-in job in queue or in progress, bulk indexing is in progress.
-    $faultInJobQueueTime = Invoke-Sqlcmd -Query "SELECT QueueTime FROM dbo.tbl_JobQueue WHERE JobSource = '$collectionId' AND JobId = '$(Get-AccountFaultInJobId -EntityType $EntityType)' AND JobState >= 0" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName | Select-Object -ExpandProperty QueueTime
+ $faultInJobQueueTime = Invoke-Sqlcmd -Query "SELECT QueueTime FROM dbo.tbl_JobQueue WHERE JobSource = '$collectionId' AND JobId = '$(Get-AccountFaultInJobId -EntityType $EntityType)' AND JobState >= 0" -ServerInstance $SQLServerInstance -Database $ConfigurationDatabaseName @trustCertParam | Select-Object -ExpandProperty QueueTime
     if ($faultInJobQueueTime)
     {
         return $true
     }
 
     # If collection indexing unit is not present, bulk indexing is not in progress.
-    $collectionIndexingUnitId = Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE TfsEntityId = '$collectionId' AND EntityType = '$EntityType' AND IndexingUnitType = 'Collection' AND IsDeleted = 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty IndexingUnitId
+ $collectionIndexingUnitId = Invoke-Sqlcmd -Query "SELECT IndexingUnitId FROM Search.tbl_IndexingUnit WHERE TfsEntityId = '$collectionId' AND EntityType = '$EntityType' AND IndexingUnitType = 'Collection' AND IsDeleted = 0" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty IndexingUnitId
     if (!$collectionIndexingUnitId)
     {
         return $false
     }
     
     # If crawl metadata operation is in queue or in progress, bulk indexing is in progress.
-    $crawlMetadataOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'CrawlMetadata' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty Id
+ $crawlMetadataOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'CrawlMetadata' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty Id
     if ($crawlMetadataOperationId)
     {
         return $true
     }
     
     # If collection begin bulk indexing operation is in queue or in progress, bulk indexing is in progress.
-    $collectionBeginBulkIndexOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'BeginBulkIndex' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty Id
+ $collectionBeginBulkIndexOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'BeginBulkIndex' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty Id
     if ($collectionBeginBulkIndexOperationId)
     {
         return $true
     }
     
     # If collection complete bulk indexing operation is in queue or in progress, bulk indexing is in progress.
-    $collectionCompleteBulkIndexOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'CompleteBulkIndex' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName | Select-Object -ExpandProperty Id
+ $collectionCompleteBulkIndexOperationId = Invoke-Sqlcmd -Query "SELECT Id FROM Search.tbl_IndexingUnitChangeEvent WHERE IndexingUnitId = $collectionIndexingUnitId AND ChangeType = 'CompleteBulkIndex' AND State IN ('Pending', 'Queued', 'InProgress')" -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName @trustCertParam | Select-Object -ExpandProperty Id
     if ($collectionCompleteBulkIndexOperationId)
     {
         return $true
@@ -927,7 +984,10 @@ function Get-SupportedDocumentContractType
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     $registryPath = $null
@@ -957,7 +1017,7 @@ function Get-SupportedDocumentContractType
         }
     }
 
-    $supportedContractType = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $registryPath
+    $supportedContractType = Get-ServiceRegistryValue -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -RegistryPath $registryPath -TrustServerCertificate:$TrustServerCertificate
     Write-Log "Supported document contract type for entity type [$EntityType] = [$supportedContractType]." -Level Verbose
     return $supportedContractType
 }

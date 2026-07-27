@@ -26,7 +26,10 @@ function Test-IndicesHaveUnsupportedMappings
 
         [Parameter(Mandatory=$True)]
         [ValidateSet("Code", "WorkItem", "Wiki")]
-        [string] $EntityType
+        [string] $EntityType,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     $actionsRecommended = @()
@@ -46,7 +49,7 @@ function Test-IndicesHaveUnsupportedMappings
     }
 
     # Make sure the unsupported mappings defined above are not actually supported. This is just to make sure the script has no bugs.
-    $supportedDocumentContractType = Get-SupportedDocumentContractType -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -EntityType $EntityType
+    $supportedDocumentContractType = Get-SupportedDocumentContractType -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -EntityType $EntityType -TrustServerCertificate:$TrustServerCertificate
     $supportedMapping = Get-MappingName -DocumentContractType $supportedDocumentContractType
     if ($unsupportedMappingNames[$EntityType].Contains($supportedMapping))
     {
@@ -115,7 +118,7 @@ function Test-IndicesHaveUnsupportedMappings
         foreach ($collection in $aggregationResponse.aggregations.collections.buckets)
         {
             $affectedCollectionId = $collection.key
-            $affectedCollectionName = Get-CollectionName -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionId $affectedCollectionId
+            $affectedCollectionName = Get-CollectionName -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -CollectionId $affectedCollectionId -TrustServerCertificate:$TrustServerCertificate
             if ($affectedCollectionName -eq $CollectionName)
             {
                 Write-Log "Collection [$affectedCollectionName] has [$($collection.doc_count)] documents in the index to be deleted. It must be re-indexed." -Level Error

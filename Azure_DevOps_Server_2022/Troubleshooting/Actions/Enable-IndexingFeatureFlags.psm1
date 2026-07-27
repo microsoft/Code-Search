@@ -28,7 +28,10 @@ function Enable-IndexingFeatureFlags
         [string] $EntityType,
         
         [Parameter(Mandatory=$False)]
-        [string] $AdditionalParam
+        [string] $AdditionalParam,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
 
     $message = "Enable indexing of [$EntityType] in collection [$CollectionName]"
@@ -39,28 +42,28 @@ function Enable-IndexingFeatureFlags
         {
             "Code"
             {
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Code.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Code.CrudOperations" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations" -State On
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Code.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Code.CrudOperations" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Code.CrudOperations" -State On -TrustServerCertificate:$TrustServerCertificate
                 break
             }
 
             "WorkItem"
             {
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.WorkItem.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.WorkItem.CrudOperations" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations" -State On
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.WorkItem.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.WorkItem.CrudOperations" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.WorkItem.CrudOperations" -State On -TrustServerCertificate:$TrustServerCertificate
                 break
             }
 
             "Wiki"
             {
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Wiki.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State On
-                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State On
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Wiki.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.Indexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -ConfigurationDatabaseName $ConfigurationDatabaseName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State On -TrustServerCertificate:$TrustServerCertificate
+                Set-FeatureFlag -SQLServerInstance $SQLServerInstance -CollectionDatabaseName $CollectionDatabaseName -CollectionName $CollectionName -FeatureName "Search.Server.Wiki.ContinuousIndexing" -State On -TrustServerCertificate:$TrustServerCertificate
                 break
             }
 

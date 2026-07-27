@@ -1,4 +1,4 @@
-﻿#Fetch repository documents count data from provided ES instance.
+#Fetch repository documents count data from provided ES instance.
 #Run the script with script <ES Connection String> <Destination>
 #Output will be stored in a single json file at the given destination.
 #Format of the output is same as the one returned by elasticsearch for nested aggregation queries.

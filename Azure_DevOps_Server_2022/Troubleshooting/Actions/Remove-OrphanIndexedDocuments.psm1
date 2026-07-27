@@ -28,13 +28,17 @@ function Remove-OrphanIndexedDocuments
         [string] $EntityType,
 
         [Parameter(Mandatory=$False)]
-        [string] $AdditionalParam
+        [string] $AdditionalParam,
+
+        [Parameter(Mandatory=$False)]
+        [switch] $TrustServerCertificate
     )
+    $trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
     # Get collection Id, index name and mapping name from collection indexing unit
     $sqlQueryProperties = "EntityType='$EntityType'"
     $sqlFullPath = "$PSScriptRoot\..\SqlScripts\GetCollectionIndexingUnitDetails.sql"
-    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlQueryProperties
+    $queryResults = Invoke-Sqlcmd -InputFile $sqlFullPath -ServerInstance $SQLServerInstance -Database $CollectionDatabaseName -Variable $sqlQueryProperties @trustCertParam
     if ($queryResults)
     {
         Write-Log "SQL query results: [$($queryResults | Out-String)]." -Level Verbose

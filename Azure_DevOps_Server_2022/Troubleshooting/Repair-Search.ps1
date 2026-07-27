@@ -38,6 +38,9 @@
     .PARAMETER EntityType
     Entity type of the impacted collection.
 
+    .PARAMETER TrustServerCertificate
+    If specified, the server certificate is trusted when connecting to SQL Server. Use this when SQL Server uses a self-signed certificate.
+
     .INPUTS
     None. You cannot pipe objects to Repair-Search.
 
@@ -93,7 +96,10 @@ Param
 
     [Parameter(Mandatory=$True)]
     [ValidateSet("Code", "WorkItem", "Wiki")]
-    [string] $EntityType
+    [string] $EntityType,
+
+    [Parameter(Mandatory=$False)]
+    [switch] $TrustServerCertificate
 )
 
 $ErrorActionPreference = "Stop" # We do not want to continue executing the script if we encounter a failure
@@ -109,6 +115,8 @@ Set-Variable LogFilePath -Option AllScope -Scope Global -Force -Value $logFilePa
 # $VerbosePreference does not get passed to all cmdlets by default for some reason. To avoid having to pass it explicitly to all cmdlets
 # which is prone to manual error, we will save its value in a global variable which will be accessible everywhere.
 Set-Variable RepairSearchVerbosePreference -Option ReadOnly -Scope Global -Force -Value $VerbosePreference -Confirm:$false -WhatIf:$false
+
+$trustCertParam = if ($TrustServerCertificate) { @{TrustServerCertificate = $true} } else { @{} }
 
 try
 {
@@ -142,6 +150,7 @@ try
             -ElasticsearchServiceUrl $ElasticsearchServiceUrl `
             -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
             -EntityType $EntityType `
+            @trustCertParam `
             -Verbose:$VerbosePreference `
             -WhatIf:$WhatIfPreference `
             -Confirm:$confirmationRequired `
@@ -215,6 +224,7 @@ try
                 -ElasticsearchServiceCredential $ElasticsearchServiceCredential `
                 -EntityType $EntityType `
                 -AdditionalParam $additionalParam `
+                @trustCertParam `
                 -Verbose:$VerbosePreference `
                 -WhatIf:$WhatIfPreference `
                 -Confirm:$confirmationRequired `
