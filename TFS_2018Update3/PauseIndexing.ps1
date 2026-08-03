@@ -47,7 +47,7 @@ function PauseWikiIndexing
 Write-Host "This would pause indexing for all the collections. Do you want to continue - Yes or No? " -NoNewline -ForegroundColor Magenta
 $userInput = Read-Host
 
-if($userInput -like "Yes")
+if($userInput -like "Yes" -or $userInput -like "y")
 {
     [System.ENVIRONMENT]::CurrentDirectory = $PWD
     Push-Location
@@ -91,5 +91,6 @@ if($userInput -like "Yes")
 }
 else
 {
-    Write-Warning "Exiting! Indexing was not paused." -ForegroundColor Cyan
+    # Write-Warning has no color
+    Write-Warning "Exiting! Indexing was not paused." # -ForegroundColor Cyan
 }
