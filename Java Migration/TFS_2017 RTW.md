@@ -21,7 +21,7 @@ execute "service.bat stop"
 execute "service.bat remove"
 
 ## Step 4: Download and Install Azul Zulu Java 
-Download and install [OpenJDK 7u201](https://cdn.azul.com/zulu/bin/zulu7.25.0.5-jdk7.0.201-win_x64.msi)
+Download and install latest version of [OpenJDK 7](https://www.azul.com/downloads/zulu-community/?&version=java-7-lts&os=windows&os-details=Windows&architecture=x86-64-bit&package=jdk)
 
 ## Step 5: Update JAVA_HOME with Azul Zulu path
 ![Update Java Home](java_home.png)
