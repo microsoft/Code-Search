@@ -1,4 +1,5 @@
 ﻿#Display respository indexing status for a given collection.
+#Go to the code srach url i.e. localhost:9200/_cat/indices and check the index names (ex. wikixxx, coexxx etc.) and replace it with codesearchshared*
 
 [CmdletBinding()]
 Param(
